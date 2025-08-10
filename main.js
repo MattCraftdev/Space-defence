@@ -1,18 +1,61 @@
+
+// Screens and stuff
+const titleScreen = document.getElementById("titlepage");
+const levelSelectScreen = document.getElementById("levelSelect");
+const gameScreen = document.getElementById("playing");
+
+document.getElementById("start").addEventListener("click", () => {
+  titleScreen.style.display = "none";
+  gameScreen.style.display = "none"
+  levelSelectScreen.style.display = "block";
+});
+
+document.getElementById("back").addEventListener("click", () => {
+  levelSelectScreen.style.display = "none";
+  gameScreen.style.display = "none"
+  titleScreen.style.display = "block";
+});
+
+// when click buttons to play, it goes to play
+const buttons = document.getElementsByClassName("levelBtn");
+
+for (let button of buttons) {
+  button.addEventListener("click", () => {
+    levelSelectScreen.style.display = "none";
+    gameScreen.style.display = "block";
+  });
+}
+
+
+// Stuff i need
 const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d")
 const moneyDisplay = document.getElementById("money");
+const waveDisplay = document.getElementById("wave");
 
-const PATH = [  // simple path points enemies follow (x,y)
-  { x: 0, y: 180 },
-  { x: 600, y: 180 },
-];
 
+const levelDisplay = document.getElementById("level");
+let level = 1
+window.updateLevel = function() {
+  levelDisplay.textContent = level;
+}
+
+
+
+let enemies = [];
+let towers = [];
+let bullets = [];
+let wave = 1;
+let frameCount = 0;
+
+const PATH = [
+  {x:100, y: 300},
+  {x:400, y: 300},
+]
 let money = 100;
 const TOWER_COST = 50;
 
-// Draw the path line
-
-
+// Enemies
 class Enemy {
   constructor() {
     this.speed = 1;
@@ -105,6 +148,7 @@ class Speedling extends Enemy {
   
 }
 
+// towers
 class Tower {
   constructor(x, y) {
     this.x = x;
@@ -114,16 +158,23 @@ class Tower {
     this.counter = 0;
   }
 
-  draw() {
+  draw(selected = false) {
     ctx.fillStyle = "blue";
     ctx.fillRect(this.x - 15, this.y - 15, 30, 30);
 
-    // Optional: draw range circle
+  if (selected) {
+    ctx.strokeStyle = "yellow";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
+  }
+
+  // range circle
     ctx.strokeStyle = "rgba(0,0,255,0.3)";
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
     ctx.stroke();
   }
+
 
   canShoot() {
     return this.counter === 0;
@@ -139,6 +190,7 @@ class Tower {
   }
 }
 
+// Bullets
 class Bullet {
   constructor(x, y, target) {
     this.x = x;
@@ -186,59 +238,107 @@ class Bullet {
   }
 }
 
-let enemies = [];
-let towers = [];
-let bullets = [];
-let timer = 0;
+setInterval(() => {
+  spawnEnemyWave(wave);
+  wave++;
+}, 5000);
 
-setInterval(() =>  {
-  timer+=1;
-}, 1000);
+function spawnEnemyWave(wave) {
+  let count = wave;
+  let i = 0;
+  
+  const spawnInterval = setInterval(() => {
+    if (i < count) {
+      enemies.push(new Enemy());
 
-function spawnEnemy() {
-  enemies.push(new Enemy());
-  if (timer>=5) {
-    enemies.push(new Sheller());
-  };
-  if (timer>=10)
-    enemies.push(new Speedling());
-};
+      if (wave >= 5 && i === count - 2) {
+        enemies.push(new Sheller());
+      }
+      if (wave >= 10 && i === count - 1) {
+        enemies.push(new Speedling());
+      }
 
-  setInterval(() =>  {
-    spawnEnemy();
-  }, 2000);
+      i++;
+    } else {
+      clearInterval(spawnInterval);
+      updateWaves();
+    }
+  }, 1000);
+}
+
+function updateWaves() {
+  waveDisplay.textContent = wave;
+}
   
 function updateMoney() {
   moneyDisplay.textContent = money;
 }
 
+
 // Place towers by tapping/clicking
+
+let selectedTower = null;
+
+function isPointInTower(x, y, tower) {
+  return (
+    x >= tower.x - 15 &&
+    x <= tower.x + 15 &&
+    y >= tower.y - 15 &&
+    y <= tower.y + 15
+  )
+}
+
+
 canvas.addEventListener("click", (e) => {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
+  
+  let clickedOnTower = false;
 
-  if (money >= TOWER_COST) {
-    towers.push(new Tower(x, y));
-    money -= TOWER_COST;
-    updateMoney();
-  } else {
-    alert("Not enough money for a tower!");
+  // Check if clicked on a tower to select/sell
+  for (let i = 0; i < towers.length; i++) {
+    if (isPointInTower(x, y, towers[i])) {
+      selectedTower = towers[i];
+      clickedOnTower = true;
+      break;
+    }
+  }
+
+  // If no tower selected, try placing a new tower
+  if (!clickedOnTower) {
+    selectedTower = null;
+    if (money >= TOWER_COST) {
+      towers.push(new Tower(x, y));
+      money -= TOWER_COST;
+      updateMoney();
+    } else {
+      alert("Not enough money for a tower!");
+    }
   }
 });
+
+const sellButton = document.getElementById("selltower");
+
+sellButton.addEventListener("click", () => {
+  if (selectedTower) {
+    // Refund 50% of tower cost
+    const refund = Math.floor(TOWER_COST * 0.5);
+    money += refund;
+    updateMoney();
+
+    // Remove the tower
+    towers = towers.filter(t => t !== selectedTower);
+    selectedTower = null;
+  } else {
+    alert("No tower selected to sell!");
+  }
+});
+
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = 'brown';
-  ctx.lineWidth = 30;
-  ctx.beginPath();
-  ctx.moveTo(PATH[0].x, PATH[0].y);
-  ctx.lineTo(PATH[1].x, PATH[1].y);
-  ctx.stroke();
-  ctx.lineWidth = 1;
-  // Spawn enemies every 120 frames (~2 seconds at 60fps)
-  // Move and draw enemies
   enemies = enemies.filter(e => !e.isDead);
   enemies.forEach(enemy => {
     enemy.move();
@@ -260,7 +360,7 @@ function gameLoop() {
       }
     }
 
-    tower.draw();
+    tower.draw(tower === selectedTower);
   });
 
   // Move and draw bullets
@@ -275,7 +375,7 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-let frameCount = 0;
+
 updateMoney();
 gameLoop();
 
