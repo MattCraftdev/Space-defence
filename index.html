@@ -3,14 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Simple Tower Defense</title>
+  <title>Tower Defense</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Simple Tower Defense</h1>
-  <p>Money: <span id="money">100</span></p>
-  <canvas id="game" width="600" height="400"></canvas>
+  
+  <nav id = "titlepage">
+    <h1>Title page</h1>
+    <button id = "start">Play</button>
+  </nav>
+  
+  
+  <nav id = "levelSelect">
+    <h2 id = "level select">Level Select</h2>
+    <button id = "back">back</button>
+    <button id= "level1Btn" class = "levelBtn">Colony Fire</button>
+    <button id = "level2Btn" class = "levelBtn">Level 2</button>
+    <button id = "level3Btn" class = "levelBtn">Level 3</button>
+  </nav>
 
+
+
+  <nav id = "playing">
+    <h1>Tower Defense</h1>
+    <p>Money: <span id="money">100</span></p>
+    <p>Wave: <span id = "wave">1</span></p>
+    <p>Level: <span id = "level">1</span></p>
+    
+    <section id = "canvascontainer">
+      <canvas id="game" width="800" height="600" style = "z-index: 1"></canvas>
+      
+      <canvas id = "path" width = "800" height ="600" style = "z-index: 0"></canvas>
+    </section>
+    
+    <button id ="selltower">Sell tower</button>
+  </nav>
+ 
+  
+  
   <script src="main.js"></script>
-</body>
+  <script src="Levelselect.js"></script>
 </html>
+</body>
