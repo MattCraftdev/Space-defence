@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tower Defense</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  
+    <nav id = "titlepage">
+        <h1>Space Defence</h1>
+        <button id = "start">Play</button>
+    </nav>
+  
+  
+    <nav id = "levelSelect">
+        <h2 id = "level select">Level Select</h2>
+        <button id = "back">back</button>
+        <button id= "level1Btn" class = "levelBtn">Colony Fire [1]</button>
+        <button id = "level2Btn" class = "levelBtn">Level 2</button>
+        <button id = "level3Btn" class = "levelBtn">Level 3</button>
+    </nav>
+
+
+
+
+
+    <nav id = "playing">
+        <h1>Tower Defense</h1>
+        <p>Money: <span id="money">100</span></p>
+        <p>Wave: <span id = "wave">1</span></p>
+        <p>Level: <span id = "level">1</span></p>
+        
+        <section id = "canvascontainer">
+        <canvas id="game" width="800" height="600" style = "z-index: 1"></canvas>
+        
+        <canvas id = "path" width = "800" height ="600" style = "z-index: 0"></canvas>
+        </section>
+        
+        <button id ="selltower" style = "z-index: 2">Sell tower</button>
+    
+        <button id = "gunner">Gunner - $50</button>
+        <button id = "tank">Tank - $150</button>
+    </nav>
+ 
+  
+  
+    <script src="main.js" defer></script>
+    <script src="Levelselect.js" defer></script>
+</html>
+</body>
