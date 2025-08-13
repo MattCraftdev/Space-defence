@@ -1,10 +1,12 @@
-const canvas = document.getElementById("game");
-// Stuff i need
-const ctx = canvas.getContext("2d")
-// Screens and stuff
-const titleScreen = document.getElementById("titlepage");
-const levelSelectScreen = document.getElementById("levelSelect");
-const gameScreen = document.getElementById("playing");
+// when click buttons to play, it goes to play
+const buttons = document.getElementsByClassName("levelBtn");
+
+for (let button of buttons) {
+    button.addEventListener("click", () => {
+        levelSelectScreen.style.display = "none";
+        gameScreen.style.display = "block";
+    });
+}
 
 document.getElementById("start").addEventListener("click", () => {
     titleScreen.style.display = "none";
@@ -18,23 +20,9 @@ document.getElementById("back").addEventListener("click", () => {
     titleScreen.style.display = "block";
 });
 
-// when click buttons to play, it goes to play
-const buttons = document.getElementsByClassName("levelBtn");
-
-for (let button of buttons) {
-    button.addEventListener("click", () => {
-        levelSelectScreen.style.display = "none";
-        gameScreen.style.display = "block";
-    });
-}
-
 
 //displays
-const moneyDisplay = document.getElementById("money");
-const waveDisplay = document.getElementById("wave");
 
-
-const levelDisplay = document.getElementById("level");
 let level = 1
 window.updateLevel = function() {
     levelDisplay.textContent = level;
@@ -42,22 +30,65 @@ window.updateLevel = function() {
 
 
 
-let enemies = [];
-let towers = [];
-let bullets = [];
-let wave = 1;
-let frameCount = 0;
 
-const PATH = [
-    {x:100, y: 300},
-    {x:400, y: 300},
-]
-let money = 100;
+// Exports
+export const canvas = document.getElementById("game");
+export const ctx = canvas.getContext("2d");
+
+export const titleScreen = document.getElementById("titlepage");
+export const levelSelectScreen = document.getElementById("levelSelect");
+export const gameScreen = document.getElementById("playing");
+
+export const moneyDisplay = document.getElementById("money");
+export const waveDisplay = document.getElementById("wave");
+export const levelDisplay = document.getElementById("level");
+
+
+export let frameCount = 0;
+
+export const gameState = {
+    wave: 1,
+    money: 100,
+    enemies: [],
+    towers: [],
+    bullets : [],
+    path: [],
+}
+
+import { checkWaveCleared } from "./Levelselect.js"
+
+// Tower costs
 
 const TOWER_COSTS = {
     gunner: 50,
     tank: 150
 }
+
+// Images
+const gunnerimg = document.getElementById("gunnerimg");
+gunnerimg.src = "images/gunner.png";
+
+const tankimg = document.getElementById("tankimg");
+tankimg.src = "images/tank.png"
+
+
+const swarmerimg = document.getElementById("swarmerimg");
+swarmerimg.src = "images/swarmer.png"
+
+const shelldrakimg = document.getElementById("shelldrakimg");
+shelldrakimg.src = "images/shelldrak.png"
+
+const speedlingimg = document.getElementById("speedlingimg");
+speedlingimg.src = "images/speedling.png"
+
+gunnerimg.style.display = "none";
+tankimg.style.display = "none";
+swarmerimg.style.display = "none";
+shelldrakimg.style.display = "none";
+speedlingimg.style.display = "none";
+
+
+
 
 // Enemies
 class Enemy {
@@ -68,44 +99,43 @@ class Enemy {
         this.def = 0;
         this.radius = 12;
         this.pathIndex = 0;
-        this.x = PATH[0].x;
-        this.y = PATH[0].y;
+        this.x = gameState.path[0].x;
+        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 10;
     }
 
     move() {
-        if (this.pathIndex >= PATH.length - 1) return;
-
-        const target = PATH[this.pathIndex + 1];
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (this.pathIndex >= gameState.path.length - 1) return;
+            const target = gameState.path[this.pathIndex + 1];
+            const dx = target.x - this.x;
+            const dy = target.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < this.speed) {
-        this.x = target.x;
-        this.y = target.y;
-        this.pathIndex++;
+            this.x = target.x;
+            this.y = target.y;
+            this.pathIndex++;
         
-        if (this.pathIndex >= PATH.length - 1) {
+        if (this.pathIndex >= gameState.path.length - 1) {
         // add lives going down there
-        this.IsDead = true;
+            this.IsDead = true;
         
         }
         
         } else {
-        this.x += (dx / dist) * this.speed;
-        this.y += (dy / dist) * this.speed;
+            this.x += (dx / dist) * this.speed;
+            this.y += (dy / dist) * this.speed;
         }
     }
 
     draw() {
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.drawImage(swarmerimg, this.x - 25, this.y - 25)
 
-        // Health bar
+        this.drawHealthBar()
+    }
+    
+    drawHealthBar() {
         ctx.fillStyle = "black";
         ctx.fillRect(this.x - 15, this.y - 20, 30, 5);
         ctx.fillStyle = "lime";
@@ -122,22 +152,14 @@ class Sheller extends Enemy {
         this.def = 1;
         this.radius = 20;
         this.pathIndex = 0;
-        this.x = PATH[0].x;
-        this.y = PATH[0].y;
+        this.x = gameState.path[0].x;
+        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 20;
     }
         draw() {
-        ctx.fillStyle = "purple";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Health bar
-        ctx.fillStyle = "black";
-        ctx.fillRect(this.x - 15, this.y - 20, 30, 5);
-        ctx.fillStyle = "lime";
-        ctx.fillRect(this.x - 15, this.y - 20, (this.hp / this.maxHp) * 30, 5);
+            ctx.drawImage(shelldrakimg, this.x - 50, this.y - 50)
+            this.drawHealthBar()
     }
     
 }
@@ -151,10 +173,14 @@ class Speedling extends Enemy {
         this.def = 0;
         this.radius = 10;
         this.pathIndex = 0;
-        this.x = PATH[0].x;
-        this.y = PATH[0].y;
+        this.x = gameState.path[0].x;
+        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 15;
+    }
+    draw() {
+        ctx.drawImage(speedlingimg, this.x - 25, this.y - 25)
+        this.drawHealthBar()
     }
     
 }
@@ -171,8 +197,7 @@ class Gunner {
     }
 
     draw(selected = false) {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(this.x - 15, this.y - 15, 30, 30);
+        ctx.drawImage(gunnerimg, this.x - 25, this.y - 25)
 
     if (selected) {
         ctx.strokeStyle = "yellow";
@@ -193,7 +218,7 @@ class Gunner {
     }
 
     shoot(enemy) {
-        bullets.push(new Bullet(this.x, this.y, enemy));
+        gameState.bullets.push(new Bullet(this.x, this.y, enemy));
         this.counter = this.fireRate;
     }
 
@@ -202,7 +227,7 @@ class Gunner {
     }
 }
 
-class tank extends Gunner {
+class Tank extends Gunner {
     constructor (x, y) {
         super(x, y);
         this.range = 150;
@@ -211,8 +236,7 @@ class tank extends Gunner {
     }
     
     draw(selected = false) {
-        ctx.fillStyle = "darkblue";
-        ctx.fillRect(this.x - 15, this.y - 15, 30, 30);
+        ctx.drawImage(tankimg, this.x - 50, this.y - 50)
 
     if (selected) {
         ctx.strokeStyle = "yellow";
@@ -228,7 +252,7 @@ class tank extends Gunner {
     }
     
     shoot(enemy) {
-        bullets.push(new TankBullet(this.x, this.y , enemy));
+        gameState.bullets.push(new TankBullet(this.x, this.y , enemy));
         this.counter = this.fireRate;
     }
 }
@@ -277,7 +301,7 @@ class Bullet {
         this.target.hp -= truedamage;
         if (this.target.hp <= 0) {
         this.target.isDead = true;
-        money += this.target.reward;
+        gameState.money += this.target.reward;
         updateMoney();
         }
         this.isHit = true;
@@ -303,7 +327,7 @@ class TankBullet extends Bullet {
         this.target.hp -= 6 - this.target.def;  
         if (this.target.hp <= 0) this.target.isDead = true;
         
-        enemies.forEach(enemy => {
+        gameState.enemies.forEach(enemy => {
         if (enemy !== this.target) {
             const dx = enemy.x - this.target.x;
             const dy = enemy.y - this.target.y;
@@ -317,9 +341,9 @@ class TankBullet extends Bullet {
         });
     
         // Reward 
-        enemies.forEach(enemy => {
+        gameState.enemies.forEach(enemy => {
         if (enemy.isDead) {
-            money += enemy.reward;
+            gameState.money += enemy.reward;
         }
         });
     
@@ -337,11 +361,11 @@ class TankBullet extends Bullet {
 
 
 function updateWaves() {
-    waveDisplay.textContent = wave - 1;
+    waveDisplay.textContent = gameState.wave - 1;
 }
   
 function updateMoney() {
-    moneyDisplay.textContent = money;
+    moneyDisplay.textContent = gameState.money;
 }
 
 
@@ -367,9 +391,9 @@ canvas.addEventListener("click", (e) => {
     let clickedOnTower = false;
 
     // Check if clicked on a tower to select/sell
-    for (let i = 0; i < towers.length; i++) {
-        if (isPointInTower(x, y, towers[i])) {
-        selectedTower = towers[i];
+    for (let i = 0; i < gameState.towers.length; i++) {
+        if (isPointInTower(x, y, gameState.towers[i])) {
+        selectedTower = gameState.towers[i];
         clickedOnTower = true;
         
         sellButton.style.position ="absolute"
@@ -386,13 +410,13 @@ canvas.addEventListener("click", (e) => {
     if (!clickedOnTower) {
         sellButton.style.display = "none";
         selectedTower = null;
-        if (selectedTowerType && money >= TOWER_COSTS[selectedTowerType]) {
+        if (selectedTowerType && gameState.money >= TOWER_COSTS[selectedTowerType]) {
         let newTower;
         if (selectedTowerType === "gunner") newTower = new Gunner(x, y);
-        else if (selectedTowerType === "tank") newTower = new tank(x, y);
+        else if (selectedTowerType === "tank") newTower = new Tank(x, y);
         
-        towers.push(newTower);
-        money -= TOWER_COSTS[selectedTowerType];
+        gameState.towers.push(newTower);
+        gameState.money -= TOWER_COSTS[selectedTowerType];
         updateMoney();
         } else {
         alert("Not enough money or no tower selected!");
@@ -406,12 +430,12 @@ sellButton.addEventListener("click", () => {
     if (selectedTower) {
         // Refund 50% of tower cost
         const refund = Math.floor(TOWER_COSTS[selectedTower.type] * 0.5);
-        money += refund;
+        gameState.money += refund;
         updateMoney();
         sellButton.style.display = "none";
 
         // Remove the tower
-        towers = towers.filter(t => t !== selectedTower);
+        gameState.towers = gameState.towers.filter(t => t !== selectedTower);
         selectedTower = null;
     } else {
         alert("No tower selected to sell!");
@@ -422,17 +446,17 @@ sellButton.addEventListener("click", () => {
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    enemies = enemies.filter(e => !e.isDead);
-    enemies.forEach(enemy => {
+    gameState.enemies = gameState.enemies.filter(e => !e.isDead);
+    gameState.enemies.forEach(enemy => {
         enemy.move();
         enemy.draw();
     });
 
     // Update towers, shoot enemies in range
-    towers.forEach(tower => {
+    gameState.towers.forEach(tower => {
         tower.update(); 
 
-        for (const enemy of enemies) {
+        for (const enemy of gameState.enemies) {
         const dx = enemy.x - tower.x;
         const dy = enemy.y - tower.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -447,8 +471,8 @@ function gameLoop() {
     });
 
     // Move and draw bullets
-    bullets = bullets.filter(bullet => !bullet.isHit);
-    bullets.forEach(bullet => {
+    gameState.bullets = gameState.bullets.filter(bullet => !bullet.isHit);
+    gameState.bullets.forEach(bullet => {
         bullet.move();
         bullet.draw();
     });
@@ -457,8 +481,23 @@ function gameLoop() {
     frameCount++;
     requestAnimationFrame(gameLoop);
     updateWaves();
+    checkWaveCleared();
 }
 
+// Hide Stuff
+gameScreen.style.display = "none"
+levelSelectScreen.style.display = "none";
 
+
+// Stuff
 updateMoney();
 gameLoop();
+
+export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
+
+/* Version history
+V1.11.5 - Instead of drawing the sprites, I added images
+V1.11.6 - Balancing changes + changed file to module
+V1.11.7 - Fixed a few errors that have stuck with me for awhile (checkwave and pathing errors)
+V1.11.8 - Fixed tower error and optimized code
+*/

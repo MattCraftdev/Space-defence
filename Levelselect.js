@@ -1,7 +1,12 @@
-let selectedLevel = null
+
 
 const pathCanvas = document.getElementById("path")
 const ctx2 = pathCanvas.getContext("2d")
+
+import {
+    Enemy, Sheller, Speedling,
+    titleScreen, levelSelectScreen, gameScreen, gameState
+} from './main.js';
 
 
 // Levels + data
@@ -10,12 +15,12 @@ const levels = [
         id: 1,
         name: "Colony Fire",
         unlocked: true,
-        startMoney: 150,
+        startMoney: 100,
         map: "grass",
         maxwaves: 5,
         path: [{x:0,y:300},{x:800,y:300}],
         waves: [
-        [ {type: 'Enemy', count: 2} ],
+        [ { type: 'Enemy', count: 2 } ],
         
         [ { type: 'Enemy', count: 5 } ],
         
@@ -24,45 +29,64 @@ const levels = [
         [ { type: 'Enemy', count: 2 }, { type: 'Sheller', count: 2 }, { type: 'Enemy', count: 2} ],
         
         [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
-        ], spawnPattern: function(wave) {
+        ], spawnPattern: function() {
         
-        const currentWaveData = this.waves[wave - 1];
+        const currentWaveData = this.waves[gameState.wave - 1];
 
-        if (!currentWaveData) {
-        console.error(`No wave data found for wave ${wave}`);
-            return;
-        }
         let delay = 0;
         currentWaveData.forEach(enemyGroup => {
         for (let i = 0; i < enemyGroup.count; i++) {
             setTimeout(() => {
-            if (enemyGroup.type === 'Enemy') enemies.push(new Enemy());
-            else if (enemyGroup.type === 'Sheller') enemies.push(new Sheller());
-            else if (enemyGroup.type === 'Speedling') enemies.push(new Speedling());
+            if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
+            else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
+            else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
             }, delay);
             delay += 1500; // adjust delay between spawns
             }
         });
         }
     
-    
     },
     {
         id: 2,
-        name: "Sand",
+        name: "",
         unlocked: false,
         startMoney: 150,
         map: "grass",
-        maxwaves: 10,
+        maxwaves: 7,
         path: [{x:0,y:200},{x:800,y:500}],
-        spawnPattern: function(wave) {
-        for (let i = 0; i < wave; i++) {
-            setTimeout(() => enemies.push(new Enemy()), i * 600);
+        waves: [
+        [ { type: 'Enemy', count: 2 } ],
+        
+        [ { type: 'Enemy', count: 5 } ],
+        
+        [ { type: 'Enemy', count: 3 }, { type: 'Sheller', count: 1 } ],
+        
+        [ { type: 'Enemy', count: 2 }, { type: 'Sheller', count: 2 }, { type: 'Enemy', count: 2} ],
+        
+        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
+
+        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
+
+        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
+
+        ], spawnPattern: function(wave) {
+        
+        const currentWaveData = this.waves[gameState.wave - 1];
+
+        let delay = 0;
+        currentWaveData.forEach(enemyGroup => {
+        for (let i = 0; i < enemyGroup.count; i++) {
+            setTimeout(() => {
+            if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
+            else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
+            else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
+            }, delay);
+            delay += 1500; // adjust delay between spawns
+            }
+        });
         }
-        if (wave >= 5) {
-            setTimeout(() => enemies.push(new Sheller()), 2000);
-        }
-        }
+        
     },
     {
         id: 3,
@@ -72,21 +96,11 @@ const levels = [
         map: "snow",
         maxwaves: 12,
         path: [{x:0,y:100},{x:800,y:400}],
-        spawnPattern: function(wave) {
-        for (let i = 0; i < wave; i++) {
-            setTimeout(() => enemies.push(new Speedling()), i * 400);
-        }
-        }
     }
     ];
 
 // ====== Game Variables ======
 let currentLevel = null;
-wave = 1;
-money = 0;
-enemies = [];
-towers = [];
-bullets = [];
 let gameRunning = false;
 
  
@@ -120,33 +134,35 @@ function loadLevel(level) {
         return;
     } else {
     currentLevel = level;
-    wave = 1;
-    money = level.startMoney;
-    enemies = [];
-    towers = [];
-    bullets = [];
+    getCurrentPath();
+    gameState.wave = 1;
+    gameState.money = level.startMoney;
+    gameState.enemies = [];
+    gameState.towers = [];
+    gameState.bullets = [];
     
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
     drawPath();
-        
-    window.PATH = level.path;
+    
+    
         
     document.getElementById("path").style.display = "block";
     
     console.log(`Loading ${level.name} with map: ${level.map}`);
-    
+
+    console.log(currentLevel)
+
     if (!gameRunning) {
         gameRunning = true;
 
     }
-    updateMoney();
     startWave();
     }
 }
 // waves
 function startWave() {
     if (currentLevel) {
-        if (wave > currentLevel.maxwaves) {
+        if (gameState.wave > currentLevel.maxwaves) {
             currentLevel
             const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
             if (currentIndex !== -1 && currentIndex + 1 < levels.length) {
@@ -159,25 +175,31 @@ function startWave() {
             gameScreen.style.display = "none"
             levelSelectScreen.style.display = "block";
             }
-            if (enemies.length === 0) {
-                currentLevel.spawnPattern(wave);
-                wave++;
+            if (gameState.enemies.length === 0) {
+                currentLevel.spawnPattern(gameState.wave);
+                gameState.wave++;
                 console.log("Wave passing")
             }
     }
 }
 
 function checkWaveCleared() {
-    if (enemies.length === 0) {
+    if (gameState.enemies.length === 0) {
         setTimeout(() => {
         startWave();
         }, 3000);
     }
 };
 
-setInterval (() => {
-    window.checkWaveCleared();
-}, 1000);
+export { checkWaveCleared }
+
+
+function getCurrentPath() {
+    console.log("Getting path")
+    gameState.path = currentLevel ? currentLevel.path : [];
+}
+
+
 
 document.getElementById("level1Btn").addEventListener("click", () => {
     loadLevel(levels[0]);
