@@ -1,6 +1,8 @@
+import { levelNumber } from "./Levelselect.js"
+import { checkWaveCleared } from "./Levelselect.js"
+
 // when click buttons to play, it goes to play
 const buttons = document.getElementsByClassName("levelBtn");
-
 for (let button of buttons) {
     button.addEventListener("click", () => {
         levelSelectScreen.style.display = "none";
@@ -21,11 +23,9 @@ document.getElementById("back").addEventListener("click", () => {
 });
 
 
-//displays
 
-let level = 1
 window.updateLevel = function() {
-    levelDisplay.textContent = level;
+    levelDisplay.textContent = levelNumber;
 }
 
 
@@ -48,18 +48,20 @@ export let frameCount = 0;
 
 export const gameState = {
     wave: 1,
+    maxwaves: 1,
     money: 100,
     enemies: [],
     towers: [],
     bullets : [],
     path: [],
+    gameRunning: false,
 }
 
-import { checkWaveCleared } from "./Levelselect.js"
+
 
 // Tower costs
 
-const TOWER_COSTS = {
+const towerCosts = {
     gunner: 50,
     tank: 150
 }
@@ -185,13 +187,16 @@ class Speedling extends Enemy {
     
 }
 
+
+
+
 // towers
 class Gunner {
     constructor(x, y) {
         this.x = x;
         this.y = y;
         this.range = 100;
-        this.fireRate = 30; // frames between shots
+        this.fireRate = 40; // frames between shots
         this.counter = 0;
         this.type = "gunner"
     }
@@ -201,7 +206,7 @@ class Gunner {
 
     if (selected) {
         ctx.strokeStyle = "yellow";
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
     }
 
@@ -240,7 +245,7 @@ class Tank extends Gunner {
 
     if (selected) {
         ctx.strokeStyle = "yellow";
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 1;
         ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
     }
 
@@ -361,11 +366,11 @@ class TankBullet extends Bullet {
 
 
 function updateWaves() {
-    waveDisplay.textContent = gameState.wave - 1;
+    waveDisplay.textContent = gameState.wave - 1 + " / " + gameState.maxwaves
 }
   
 function updateMoney() {
-    moneyDisplay.textContent = gameState.money;
+    moneyDisplay.textContent = gameState.money; 
 }
 
 
@@ -375,10 +380,10 @@ let selectedTower = null;
 
 function isPointInTower(x, y, tower) {
     return (
-        x >= tower.x - 15 &&
-        x <= tower.x + 15 &&
-        y >= tower.y - 15 &&
-        y <= tower.y + 15
+        x >= tower.x - 30 &&
+        x <= tower.x + 30 &&
+        y >= tower.y - 30 &&
+        y <= tower.y + 30
     )
 }
 
@@ -410,13 +415,13 @@ canvas.addEventListener("click", (e) => {
     if (!clickedOnTower) {
         sellButton.style.display = "none";
         selectedTower = null;
-        if (selectedTowerType && gameState.money >= TOWER_COSTS[selectedTowerType]) {
+        if (selectedTowerType && gameState.money >= towerCosts[selectedTowerType]) {
         let newTower;
         if (selectedTowerType === "gunner") newTower = new Gunner(x, y);
         else if (selectedTowerType === "tank") newTower = new Tank(x, y);
         
         gameState.towers.push(newTower);
-        gameState.money -= TOWER_COSTS[selectedTowerType];
+        gameState.money -= towerCosts[selectedTowerType];
         updateMoney();
         } else {
         alert("Not enough money or no tower selected!");
@@ -429,7 +434,7 @@ const sellButton = document.getElementById("selltower");
 sellButton.addEventListener("click", () => {
     if (selectedTower) {
         // Refund 50% of tower cost
-        const refund = Math.floor(TOWER_COSTS[selectedTower.type] * 0.5);
+        const refund = Math.floor(towerCosts[selectedTower.type] * 0.5);
         gameState.money += refund;
         updateMoney();
         sellButton.style.display = "none";
@@ -480,24 +485,34 @@ function gameLoop() {
 
     frameCount++;
     requestAnimationFrame(gameLoop);
-    updateWaves();
-    checkWaveCleared();
+
+    if (gameState.gameRunning === true) {
+        checkWaveCleared();
+        updateWaves();
+    }
+
 }
 
 // Hide Stuff
 gameScreen.style.display = "none"
 levelSelectScreen.style.display = "none";
-
+sellButton.style.display = "none";
 
 // Stuff
 updateMoney();
 gameLoop();
 
 export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
+export { updateMoney }
 
 /* Version history
-V1.11.5 - Instead of drawing the sprites, I added images
-V1.11.6 - Balancing changes + changed file to module
-V1.11.7 - Fixed a few errors that have stuck with me for awhile (checkwave and pathing errors)
 V1.11.8 - Fixed tower error and optimized code
+
+V1.11.8.1 - Moved buttons and such around
+V1.11.8.2 - Fixed little things
+V1.11.9 - Offically added level 2 and fixed more little things
+V1.11.10 - Now completing a level will show the next level (levels are auto hid)
+V1.11.10.1 - Cleaned up code for easier readability and small little improvements
+V1.11.11 - Offically added level 3
+V1.11.11.1 - Added a wave counter :o
 */

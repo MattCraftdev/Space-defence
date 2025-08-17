@@ -1,13 +1,15 @@
-
-
 const pathCanvas = document.getElementById("path")
 const ctx2 = pathCanvas.getContext("2d")
 
 import {
     Enemy, Sheller, Speedling,
-    titleScreen, levelSelectScreen, gameScreen, gameState
+    titleScreen, levelSelectScreen, gameScreen
+    ,gameState
 } from './main.js';
 
+import { updateMoney } from './main.js'
+
+let levelNumber = 1
 
 // Levels + data
 const levels = [
@@ -15,6 +17,8 @@ const levels = [
         id: 1,
         name: "Colony Fire",
         unlocked: true,
+        hearts: 50,
+        levelStars: 0,
         startMoney: 100,
         map: "grass",
         maxwaves: 5,
@@ -30,88 +34,137 @@ const levels = [
         
         [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
         ], spawnPattern: function() {
-        
-        const currentWaveData = this.waves[gameState.wave - 1];
+           if (gameState.gameRunning === true) {
+            const currentWaveData = this.waves[gameState.wave - 1];
 
-        let delay = 0;
-        currentWaveData.forEach(enemyGroup => {
-        for (let i = 0; i < enemyGroup.count; i++) {
-            setTimeout(() => {
-            if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
-            else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
-            else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
-            }, delay);
-            delay += 1500; // adjust delay between spawns
+            let delay = 0;
+            currentWaveData.forEach(enemyGroup => {
+            for (let i = 0; i < enemyGroup.count; i++) {
+                setTimeout(() => {
+                if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
+                else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
+                else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
+                }, delay);
+                delay += 2000; // adjust delay between spawns
+                }
+            });
             }
-        });
         }
-    
     },
+
     {
         id: 2,
-        name: "",
+        name: "Second Contact",
         unlocked: false,
+        hearts: 50,
+        levelStars: 0,
         startMoney: 150,
-        map: "grass",
+        map: "desert",
         maxwaves: 7,
         path: [{x:0,y:200},{x:800,y:500}],
         waves: [
-        [ { type: 'Enemy', count: 2 } ],
+        [ { type: 'Enemy', count: 3 } ],
         
-        [ { type: 'Enemy', count: 5 } ],
+        [ { type: 'Enemy', count: 7 } ],
         
-        [ { type: 'Enemy', count: 3 }, { type: 'Sheller', count: 1 } ],
+        [ { type: 'Enemy', count: 3 }, { type: 'Speedling', count: 2 } ],
         
-        [ { type: 'Enemy', count: 2 }, { type: 'Sheller', count: 2 }, { type: 'Enemy', count: 2} ],
+        [ { type: 'Speedling', count: 6 } ],
         
         [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
 
-        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
+        [ { type: 'Sheller', count: 5 } ],
 
         [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 } ],
 
-        ], spawnPattern: function(wave) {
-        
-        const currentWaveData = this.waves[gameState.wave - 1];
+        ], spawnPattern: function() {
 
-        let delay = 0;
-        currentWaveData.forEach(enemyGroup => {
-        for (let i = 0; i < enemyGroup.count; i++) {
-            setTimeout(() => {
-            if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
-            else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
-            else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
-            }, delay);
-            delay += 1500; // adjust delay between spawns
+           if (gameState.gameRunning === true) {
+            const currentWaveData = this.waves[gameState.wave - 1];
+
+            let delay = 0;
+            currentWaveData.forEach(enemyGroup => {
+            for (let i = 0; i < enemyGroup.count; i++) {
+                setTimeout(() => {
+                if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
+                else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
+                else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
+                }, delay);
+                delay += 2000; // adjust delay between spawns
+                }
+            });
             }
-        });
         }
-        
+
+
     },
     {
         id: 3,
-        name: "Frozen Trail",
+        name: "Broken City",
         unlocked: false,
+        hearts: 50,
+        levelStars: 0,
         startMoney: 200,
-        map: "snow",
-        maxwaves: 12,
-        path: [{x:0,y:100},{x:800,y:400}],
+        map: "city",
+        maxwaves: 9,
+        path: [ { x: 0, y: 100 }, { x: 100, y: 100 },
+            { x: 100, y: 200 },{ x: 400, y: 200 },
+            { x: 400, y: 500 },{ x: 800, y: 500 } ],
+        waves: [
+        [ { type: 'Speedling', count: 3 } ],
+        
+        [ { type: 'Enemy', count: 7 } ],
+        
+        [ { type: 'Speedling', count: 10 } ],
+        
+        [ { type: 'Sheller', count: 6 } ],
+        
+        [ { type: 'Enemy', count: 10 }, { type: 'Sheller', count: 4 } ],
+
+        [ { type: 'Speedling', count: 15 } ],
+
+        [ { type: 'Enemy', count: 15 }, { type: 'Speedling', count: 10 } ],
+
+        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 5 } ],
+
+        [ { type: 'Enemy', count: 5 }, { type: 'Sheller', count: 2 }, { type: 'Speedling', count: 10 } ],
+
+        ], spawnPattern: function() {
+
+           if (gameState.gameRunning === true) {
+            const currentWaveData = this.waves[gameState.wave - 1];
+
+            let delay = 0;
+            currentWaveData.forEach(enemyGroup => {
+            for (let i = 0; i < enemyGroup.count; i++) {
+                setTimeout(() => {
+                if (enemyGroup.type === 'Enemy') gameState.enemies.push(new Enemy());
+                else if (enemyGroup.type === 'Sheller') gameState.enemies.push(new Sheller());
+                else if (enemyGroup.type === 'Speedling') gameState.enemies.push(new Speedling());
+                }, delay);
+                delay += 2000; // adjust delay between spawns
+                }
+            });
+            }
+        }
+
+
     }
     ];
 
 // ====== Game Variables ======
 let currentLevel = null;
-let gameRunning = false;
 
  
 function drawPath() {
     ctx2.clearRect(0, 0, 800, 600);
 
     ctx2.fillStyle = "lightgreen";
-    if (currentLevel.map === "desert") ctx2.fillStyle = "sandybrown";
-    if (currentLevel.map === "snow") ctx2.fillStyle = "lightblue";
-    if (currentLevel.map === "city")
-        ctx.fillStyle = "lightgray"
+    console.log(currentLevel)
+    if (currentLevel.map === "desert") {ctx2.fillStyle = "sandybrown"}
+    else if (currentLevel.map === "snow") {ctx2.fillStyle = "lightblue" }
+    else if (currentLevel.map === "city") {ctx2.fillStyle = "lightgray"}
+
     ctx2.fillRect(0, 0, 800, 600);
     ctx2.strokeStyle = "gray";
     ctx2.lineWidth = 40;
@@ -128,79 +181,109 @@ function drawPath() {
 
 
 
-function loadLevel(level) {
-    if (!level.unlocked) {
-        alert("Level locked!")
-        return;
-    } else {
-    currentLevel = level;
+function loadLevel(selectedLevel) {
+    currentLevel = selectedLevel;
+    console.log(currentLevel)
     getCurrentPath();
+
+    gameState.maxwaves = currentLevel.maxwaves
     gameState.wave = 1;
-    gameState.money = level.startMoney;
+    gameState.money = selectedLevel.startMoney;
     gameState.enemies = [];
     gameState.towers = [];
     gameState.bullets = [];
-    
+    gameState.gameRunning = true;
+
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
-    drawPath();
-    
-    
-        
+            
     document.getElementById("path").style.display = "block";
-    
-    console.log(`Loading ${level.name} with map: ${level.map}`);
-
-    console.log(currentLevel)
-
-    if (!gameRunning) {
-        gameRunning = true;
-
-    }
+        
+    console.log(`Loading ${selectedLevel.name} with map: ${selectedLevel.map}`);
+    updateMoney();
+    drawPath();
     startWave();
-    }
 }
+
+
 // waves
 function startWave() {
-    if (currentLevel) {
-        if (gameState.wave > currentLevel.maxwaves) {
-            currentLevel
-            const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
-            if (currentIndex !== -1 && currentIndex + 1 < levels.length) {
-                levels[currentIndex + 1].unlocked = true;
-                console.log(`Unlocked ${levels[currentIndex + 1].name}!`);
-            }
-            gameRunning = false;
-            console.log(`Level ${level} has been done`)
-            titleScreen.style.display = "none";
-            gameScreen.style.display = "none"
-            levelSelectScreen.style.display = "block";
-            }
-            if (gameState.enemies.length === 0) {
-                currentLevel.spawnPattern(gameState.wave);
-                gameState.wave++;
-                console.log("Wave passing")
-            }
-    }
+    if (gameState.wave > currentLevel.maxwaves && gameState.enemies.length === 0) {
+
+        levelCompleted();
+
+
+
+
+
+        // Add star system with hearts
+
+        }
+
+        if (gameState.enemies.length === 0) { // If no enemies, do spawning basically
+            console.log(currentLevel)
+            currentLevel.spawnPattern();
+            gameState.wave++;
+            console.log("Wave passing!")
+        }
+
 }
 
-function checkWaveCleared() {
+
+
+
+// Functions
+function checkWaveCleared() { // Delay between waves
     if (gameState.enemies.length === 0) {
         setTimeout(() => {
         startWave();
-        }, 3000);
+        }, 1000);
     }
 };
-
-export { checkWaveCleared }
-
 
 function getCurrentPath() {
     console.log("Getting path")
     gameState.path = currentLevel ? currentLevel.path : [];
 }
 
+function levelCompleted() {
+
+    // Varible resetting 
+    gameState.wave = 1;
+    gameState.money = 100;
+    gameState.enemies = [];
+    gameState.towers = [];
+    gameState.bullets = [];
+    gameState.path = [];
+    gameState.gameRunning = false;
+
+    ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
+
+    console.log(`Level ${levelNumber} has been done`)
+
+    titleScreen.style.display = "none";
+    gameScreen.style.display = "none"
+    levelSelectScreen.style.display = "block";
+
+    // Unlocking system
+    const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
+    if (currentIndex !== -1 && currentIndex + 1 < levels.length) {
+        levels[currentIndex + 1].unlocked = true;
+        document.getElementById("level" + levels[currentIndex + 1].id + "Btn").style.display = "inline-block"
+    }
+
+}
+
+// Exporting and level buttons
+export { levelNumber }
+export { checkWaveCleared }
+
+// Hiding buttons
+document.getElementById("level2Btn").style.display = "none";
+document.getElementById("level3Btn").style.display = "none";
 
 
+
+// Loading levels per button
 document.getElementById("level1Btn").addEventListener("click", () => {
     loadLevel(levels[0]);
     updateLevel();
@@ -208,5 +291,10 @@ document.getElementById("level1Btn").addEventListener("click", () => {
 
 document.getElementById("level2Btn").addEventListener("click", () => {
     loadLevel(levels[1]);
+    updateLevel();
+});
+
+document.getElementById("level3Btn").addEventListener("click", () => {
+    loadLevel(levels[2]);
     updateLevel();
 });
