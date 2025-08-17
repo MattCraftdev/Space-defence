@@ -32,6 +32,36 @@ canvas {
     left: 110px;
 }
 
+/* Level buttons */
+
 .levelBtn {
     background-color:rgb(144, 144, 199);
+}
+
+.levelBtn:hover {
+    background-color:rgb(181, 181, 214);
+}
+
+#level1Btn {
+    position: absolute;
+    top: 190px;
+    left: 320px; 
+}
+
+#level2Btn {
+    position: absolute;
+    top: 130px;
+    left: 400px; 
+}
+
+#level3Btn {
+    position: absolute;
+    top: 115px;
+    left: 590px; 
+}
+
+#back {
+    position: absolute;
+    bottom: 50px;
+    left: 48%;
 }

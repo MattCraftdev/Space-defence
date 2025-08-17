@@ -3,11 +3,15 @@ const ctx2 = pathCanvas.getContext("2d")
 
 import {
     Enemy, Sheller, Speedling,
-    titleScreen, levelSelectScreen, gameScreen
-    ,gameState
+    gameState,
+    levelSelectScreen,
 } from './main.js';
 
-import { updateMoney } from './main.js'
+import { updateMoney, updateStars, updateLevel, showScreen } from './main.js'
+
+document.getElementById("start").addEventListener("click", () => {
+    showScreen(levelSelectScreen)
+});
 
 let levelNumber = 1
 
@@ -208,19 +212,11 @@ function loadLevel(selectedLevel) {
 // waves
 function startWave() {
     if (gameState.wave > currentLevel.maxwaves && gameState.enemies.length === 0) {
-
         levelCompleted();
-
-
-
-
-
-        // Add star system with hearts
-
         }
 
         if (gameState.enemies.length === 0) { // If no enemies, do spawning basically
-            console.log(currentLevel)
+            // console.log(currentLevel)
             currentLevel.spawnPattern();
             gameState.wave++;
             console.log("Wave passing!")
@@ -258,20 +254,37 @@ function levelCompleted() {
 
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
 
+    showScreen(levelSelectScreen)
+
     console.log(`Level ${levelNumber} has been done`)
-
-    titleScreen.style.display = "none";
-    gameScreen.style.display = "none"
-    levelSelectScreen.style.display = "block";
-
     // Unlocking system
     const currentIndex = levels.findIndex(l => l.id === currentLevel.id);
     if (currentIndex !== -1 && currentIndex + 1 < levels.length) {
         levels[currentIndex + 1].unlocked = true;
         document.getElementById("level" + levels[currentIndex + 1].id + "Btn").style.display = "inline-block"
     }
-
+    calculateStars();
 }
+
+// calculate stars
+function calculateStars() {
+
+    const heartsLeft = currentLevel.hearts
+    let starsEarned = currentLevel.levelStars
+
+    if (heartsLeft > 48) { starsEarned = 3; }
+    else if (heartsLeft > 30) { starsEarned = 2; }
+    else {starsEarned = 1;}
+
+    if (starsEarned > currentLevel.levelStars) {
+        gameState.starcount = starsEarned - currentLevel.levelStars
+        currentLevel.levelStars = starsEarned;
+        updateStars();
+    }
+}
+
+
+
 
 // Exporting and level buttons
 export { levelNumber }

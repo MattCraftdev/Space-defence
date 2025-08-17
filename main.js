@@ -1,32 +1,37 @@
 import { levelNumber } from "./Levelselect.js"
 import { checkWaveCleared } from "./Levelselect.js"
 
-// when click buttons to play, it goes to play
-const buttons = document.getElementsByClassName("levelBtn");
-for (let button of buttons) {
-    button.addEventListener("click", () => {
-        levelSelectScreen.style.display = "none";
-        gameScreen.style.display = "block";
+// Screens
+function showScreen(screenToShow) {
+    const screens = [levelSelectScreen, gameScreen, titleScreen, upgradeScreen];
+    screens.forEach(screen => {
+        screen.style.display = (screen === screenToShow) ? "block" : "none";
     });
 }
 
-document.getElementById("start").addEventListener("click", () => {
-    titleScreen.style.display = "none";
-    gameScreen.style.display = "none"
-    levelSelectScreen.style.display = "block";
-});
-
-document.getElementById("back").addEventListener("click", () => {
-    levelSelectScreen.style.display = "none";
-    gameScreen.style.display = "none"
-    titleScreen.style.display = "block";
-});
-
-
-
-window.updateLevel = function() {
-    levelDisplay.textContent = levelNumber;
+const buttons = document.getElementsByClassName("levelBtn");
+for (let button of buttons) {
+    button.addEventListener("click", () => {
+        showScreen(gameScreen)
+    });
 }
+document.getElementById("start").addEventListener("click", () => {
+    showScreen(levelSelectScreen)
+});
+
+
+document.getElementById("goupgrade").addEventListener("click", () => {
+    showScreen(upgradeScreen)
+});
+
+const backButtons = document.querySelectorAll(".back");
+
+backButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        showScreen(titleScreen)
+    });
+});
+
 
 
 
@@ -38,10 +43,12 @@ export const ctx = canvas.getContext("2d");
 export const titleScreen = document.getElementById("titlepage");
 export const levelSelectScreen = document.getElementById("levelSelect");
 export const gameScreen = document.getElementById("playing");
+export const upgradeScreen = document.getElementById("upgrades");
 
 export const moneyDisplay = document.getElementById("money");
 export const waveDisplay = document.getElementById("wave");
 export const levelDisplay = document.getElementById("level");
+export const starDisplay = document.getElementById("stars");
 
 
 export let frameCount = 0;
@@ -57,32 +64,34 @@ export const gameState = {
     gameRunning: false,
 }
 
-
-
 // Tower costs
-
 const towerCosts = {
     gunner: 50,
     tank: 150
 }
 
-// Images
+// camp map images
+const campaignmapimg = document.getElementById("campaignmapimg");
+campaignmapimg.src = "images/campaignmap.png";
+
+// Tower images
 const gunnerimg = document.getElementById("gunnerimg");
 gunnerimg.src = "images/gunner.png";
 
 const tankimg = document.getElementById("tankimg");
-tankimg.src = "images/tank.png"
+tankimg.src = "images/tank.png";
 
-
+// Enemy Images
 const swarmerimg = document.getElementById("swarmerimg");
-swarmerimg.src = "images/swarmer.png"
+swarmerimg.src = "images/swarmer.png";
 
 const shelldrakimg = document.getElementById("shelldrakimg");
-shelldrakimg.src = "images/shelldrak.png"
+shelldrakimg.src = "images/shelldrak.png";
 
 const speedlingimg = document.getElementById("speedlingimg");
-speedlingimg.src = "images/speedling.png"
+speedlingimg.src = "images/speedling.png";
 
+// Hiding Images
 gunnerimg.style.display = "none";
 tankimg.style.display = "none";
 swarmerimg.style.display = "none";
@@ -90,16 +99,13 @@ shelldrakimg.style.display = "none";
 speedlingimg.style.display = "none";
 
 
-
-
 // Enemies
 class Enemy {
     constructor() {
-        this.speed = 1;
+        this.speed = 1.25;
         this.hp = 10;
         this.maxHp = 10;
         this.def = 0;
-        this.radius = 12;
         this.pathIndex = 0;
         this.x = gameState.path[0].x;
         this.y = gameState.path[0].y;
@@ -148,11 +154,10 @@ class Enemy {
 class Sheller extends Enemy {
     constructor() {
         super();
-        this.speed = 0.3;
+        this.speed = 0.5;
         this.hp = 20;
         this.maxHp = 20;
         this.def = 1;
-        this.radius = 20;
         this.pathIndex = 0;
         this.x = gameState.path[0].x;
         this.y = gameState.path[0].y;
@@ -169,11 +174,10 @@ class Sheller extends Enemy {
 class Speedling extends Enemy {
     constructor() {
         super();
-        this.speed = 1.5;
+        this.speed = 3;
         this.hp = 8;
         this.maxHp = 8;
         this.def = 0;
-        this.radius = 10;
         this.pathIndex = 0;
         this.x = gameState.path[0].x;
         this.y = gameState.path[0].y;
@@ -364,7 +368,7 @@ class TankBullet extends Bullet {
     }
 }
 
-
+// Update Functions
 function updateWaves() {
     waveDisplay.textContent = gameState.wave - 1 + " / " + gameState.maxwaves
 }
@@ -373,6 +377,13 @@ function updateMoney() {
     moneyDisplay.textContent = gameState.money; 
 }
 
+function updateLevel() {
+    levelDisplay.textContent = levelNumber;
+}
+
+function updateStars() {
+    starDisplay.textContent = gameState.starcount
+}
 
 // Place towers by tapping/clicking
 
@@ -494,8 +505,8 @@ function gameLoop() {
 }
 
 // Hide Stuff
-gameScreen.style.display = "none"
-levelSelectScreen.style.display = "none";
+showScreen(titleScreen)
+
 sellButton.style.display = "none";
 
 // Stuff
@@ -503,16 +514,11 @@ updateMoney();
 gameLoop();
 
 export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
-export { updateMoney }
+export { updateMoney, updateLevel, updateStars, showScreen }
 
 /* Version history
-V1.11.8 - Fixed tower error and optimized code
-
-V1.11.8.1 - Moved buttons and such around
-V1.11.8.2 - Fixed little things
-V1.11.9 - Offically added level 2 and fixed more little things
-V1.11.10 - Now completing a level will show the next level (levels are auto hid)
-V1.11.10.1 - Cleaned up code for easier readability and small little improvements
-V1.11.11 - Offically added level 3
-V1.11.11.1 - Added a wave counter :o
+V1.11.11.2 - Balencing
+V1.11.12 - Added level map and button positioning
+V1.11.13 - Optimized buttons and switching screen code
+V1.12 - Added star system
 */

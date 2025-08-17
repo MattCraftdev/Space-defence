@@ -11,19 +11,24 @@
     <nav id = "titlepage">
         <h1>Space Defence</h1>
         <button id = "start">Play</button>
+        <button id = "goupgrade">Upgrade!</button>
+    </nav>
+    
+    <nav id = "upgrades">
+        <h1>Upgrades</h1>
+        <p>Stars: <span id = "stars">0</span></p>
+        <button class = "back">back</button>
     </nav>
   
-  
     <nav id = "levelSelect">
-        <h2 id = "level select">Level Select</h2>
+        <h2>Level Select</h2>
+        <img id = "campaignmapimg" alt = "campaignmapimage">        
         <button id= "level1Btn" class = "levelBtn">Colony Fire [1]</button>
         <button id = "level2Btn" class = "levelBtn">Second Contact [2]</button>
         <button id = "level3Btn" class = "levelBtn">Broken City [3]</button>
         <br>
-        <button id = "back">back</button>
-
+        <button class = "back" id = "back">back</button>
     </nav>
-
 
 
     <nav id = "playing">
@@ -33,9 +38,9 @@
         <p>Level: <span id = "level">1</span></p>
         
         <section id = "canvascontainer">
-        <canvas id="game" width="800" height="600" style = "z-index: 1"></canvas>
+        <canvas id = "game" width = "800" height = "600" style = "z-index: 1"></canvas>
         
-        <canvas id = "path" width = "800" height ="600" style = "z-index: 0"></canvas>
+        <canvas id = "path" width = "800" height = "600" style = "z-index: 0"></canvas>
         </section>
         
         <button id ="selltower" style = "z-index: 2">Sell tower</button>
@@ -43,11 +48,12 @@
         <button id = "gunner" style = "z-index: 3">Gunner - $50</button>
         <button id = "tank" style = "z-index: 3">Tank - $150</button>
     </nav>
- 
   
-  
+
+
     <script src="main.js" type = "module"></script>
     <script src="Levelselect.js" type = "module"></script>
+
 
 
     <img id = "gunnerimg" alt = "gunnerimage">
