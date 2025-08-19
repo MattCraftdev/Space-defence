@@ -1,5 +1,6 @@
 import { levelNumber } from "./Levelselect.js"
 import { checkWaveCleared } from "./Levelselect.js"
+import { createSkillTree } from "./skilltree.js"
 
 // Screens
 function showScreen(screenToShow) {
@@ -22,6 +23,7 @@ document.getElementById("start").addEventListener("click", () => {
 
 document.getElementById("goupgrade").addEventListener("click", () => {
     showScreen(upgradeScreen)
+    createSkillTree();
 });
 
 const backButtons = document.querySelectorAll(".back");
@@ -201,6 +203,8 @@ class Gunner {
         this.y = y;
         this.range = 100;
         this.fireRate = 40; // frames between shots
+        this.level = 1;
+        this.maxlevel = 1;
         this.counter = 0;
         this.type = "gunner"
     }
@@ -212,13 +216,14 @@ class Gunner {
         ctx.strokeStyle = "yellow";
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
-    }
-
-    // range circle
+        
+        // range circle
         ctx.strokeStyle = "rgba(0,0,255,0.3)";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
         ctx.stroke();
+
+    }
     }
 
 
@@ -239,6 +244,8 @@ class Gunner {
 class Tank extends Gunner {
     constructor (x, y) {
         super(x, y);
+        this.level = 1;
+        this.maxlevel = 1;
         this.range = 150;
         this.fireRate = 75;
         this.type = "tank";
@@ -251,13 +258,13 @@ class Tank extends Gunner {
         ctx.strokeStyle = "yellow";
         ctx.lineWidth = 1;
         ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
-    }
 
-    // range cir
+        // range cir
         ctx.strokeStyle = "rgba(0,0,255,0.3)";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
         ctx.stroke();
+    }
     }
     
     shoot(enemy) {
@@ -267,13 +274,30 @@ class Tank extends Gunner {
 }
 
 let selectedTowerType = null
-document.getElementById("gunner").addEventListener("click", () => {
-    selectedTowerType = "gunner"
+
+
+// ForEach optimize code
+const gunnerbtn = document.getElementById("gunner")
+const tankbtn = document.getElementById("tank")
+
+
+function selectTowerBtn(selectedTowerBtn) {
+    const selectedTowerBtns = [gunnerbtn, tankbtn];
+    selectedTowerBtns.forEach(stBtn => {
+        stBtn.style.border = (stBtn === selectedTowerBtn) ? "2px solid yellow" : "2px solid gray";
+        selectedTowerType = selectedTowerBtn.id;
+    });
+}
+
+gunnerbtn.addEventListener("click", () => {
+    selectTowerBtn(gunnerbtn)
 });
 
-document.getElementById("tank").addEventListener("click", () => {
-    selectedTowerType = "tank"
+tankbtn.addEventListener("click", () => {
+    selectTowerBtn(tankbtn)
 });
+
+selectTowerBtn(gunnerbtn)
 
 // Bullets
 class Bullet {
@@ -517,8 +541,10 @@ export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
 export { updateMoney, updateLevel, updateStars, showScreen }
 
 /* Version history
-V1.11.11.2 - Balencing
-V1.11.12 - Added level map and button positioning
-V1.11.13 - Optimized buttons and switching screen code
-V1.12 - Added star system
+V1.12.1 - Selecting buttons lights em up and selecting a tower ONLY shows their range circle
+V1.12.2 - Optizimized code
+V1.13 - Added skill tree with 3 different upgrades
+V1.13.1 - Improved skill tree
+V1.13.2 - Optimized skill tree code
+V1.13.3 - Selecting nodes works
 */

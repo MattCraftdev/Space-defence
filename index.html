@@ -15,9 +15,19 @@
     </nav>
     
     <nav id = "upgrades">
-        <h1>Upgrades</h1>
+        <svg id="skillLines" width="2000" height="2000" style= "position:absolute; top:0; left:0; z-index:0;"></svg>
+
+        <img id = "recruitimg" class = "skill-node" data-skill="Recruit" alt = "recruitimage">
+        <img id = "traineeimg" class = "skill-node" data-skill="Trainee" alt = "traineeimage">
+        <img id = "veteranimg" class = "skill-node" data-skill="Veteran" alt = "veteranimage">
+
+
+
+        
+        <h1 id = "upgradesheader">Upgrades</h1>
         <p>Stars: <span id = "stars">0</span></p>
-        <button class = "back">back</button>
+        <button class = "back" id = "upgradesback">back</button>
+
     </nav>
   
     <nav id = "levelSelect">
@@ -53,6 +63,7 @@
 
     <script src="main.js" type = "module"></script>
     <script src="Levelselect.js" type = "module"></script>
+    <script src="skilltree.js" type = "module"></script>
 
 
 
@@ -62,5 +73,7 @@
     <img id = "swarmerimg" alt = "swarmerimage">
     <img id = "shelldrakimg" alt = "shelldrakimage">
     <img id = "speedlingimg" alt = "speedlingimage">
+
+
 </html>
 </body>

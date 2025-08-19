@@ -8,6 +8,8 @@ import {
 } from './main.js';
 
 import { updateMoney, updateStars, updateLevel, showScreen } from './main.js'
+import { applySkills } from './skilltree.js'
+
 
 document.getElementById("start").addEventListener("click", () => {
     showScreen(levelSelectScreen)
@@ -197,6 +199,8 @@ function loadLevel(selectedLevel) {
     gameState.towers = [];
     gameState.bullets = [];
     gameState.gameRunning = true;
+    
+    applySkills();
 
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
             
@@ -281,6 +285,7 @@ function calculateStars() {
         currentLevel.levelStars = starsEarned;
         updateStars();
     }
+    console.log(currentLevel.levelStars)
 }
 
 

@@ -24,12 +24,28 @@ canvas {
     position: absolute;
     top: 180px;
     left: 10px;
+    background-color:silver;
 }
+
+#gunner:hover {
+    position: absolute;
+    top: 180px;
+    left: 10px;
+    background-color:rgb(216, 216, 216);
+}   
 
 #tank {
     position: absolute;
     top: 180px;
     left: 110px;
+    background-color:silver;
+}
+
+#tank:hover {
+    position: absolute;
+    top: 180px;
+    left: 110px;
+    background-color:rgb(216, 216, 216);
 }
 
 /* Level buttons */
@@ -64,4 +80,20 @@ canvas {
     position: absolute;
     bottom: 50px;
     left: 48%;
+}
+
+#upgradesback {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+}
+
+#upgradesheader {
+    position: fixed;
+    left: 45%;
+    top: 10px;
+}
+
+.skill-node {
+  position: absolute;
 }
