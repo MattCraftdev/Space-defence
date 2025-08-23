@@ -20,6 +20,7 @@ canvas {
     height: 600px;
 }
 
+/* Tower buttons */
 #gunner {
     position: absolute;
     top: 180px;
@@ -82,16 +83,13 @@ canvas {
     left: 48%;
 }
 
-#upgradesback {
+/* Upgrades page stuff */
+#upgradestatholder {
     position: fixed;
-    top: 25px;
-    right: 25px;
-}
-
-#upgradesheader {
-    position: fixed;
-    left: 45%;
-    top: 10px;
+    background-color:lightgray;
+    bottom:0px;
+    height:200px;
+    width:100%;
 }
 
 .skill-node {

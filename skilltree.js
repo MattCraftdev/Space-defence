@@ -1,19 +1,19 @@
+// Imports
 import { gameState } from './main.js'
 import { updateStars } from './main.js'
-
 import { Gunner, Tank } from './main.js'
 
 // Images
-const recruitimg = document.getElementById("recruitimg");
+const recruitimg = document.getElementById("Recruit");
 recruitimg.src = "images/recruit.png";
 
-const traineeimg = document.getElementById("traineeimg");
+const traineeimg = document.getElementById("Trainee");
 traineeimg.src = "images/trainee.png";
 
-const veteranimg = document.getElementById("veteranimg");
+const veteranimg = document.getElementById("Veteran");
 veteranimg.src = "images/veteran.png";
 
-
+// Skill nodes
 const skillNodes = {
 
     "Recruit": {
@@ -37,34 +37,58 @@ const skillNodes = {
         prerequisites: ["Trainee"],
         position: [ { x: 50, y: 500 } ]
     },
-
 }
-
 
 // Clicking images to unlock stuff
-const recruit = document.getElementById("recruitimg");
-const trainee = document.getElementById("traineeimg");
-const veteran = document.getElementById("veteranimg");
+let selectedNode = null;
+let selectedNodeName = null;
 
-function selectNode(selectedNode) {
+const recruit = document.getElementById("Recruit");
+const trainee = document.getElementById("Trainee");
+const veteran = document.getElementById("Veteran");
+
+function selectNode(clickedNode) {
     console.log("Node being selected")
     const selectedNodes = [recruit, trainee, veteran];
-    selectedNodes.forEach(imageNode => {
-        imageNode.style.border = (imageNode === selectedNode) ? "2px solid yellow" : "";
+    selectedNodes.forEach(node => {
+        node.style.border = (node === clickedNode) ? "2px solid yellow" : "2px solid gray";
     });
+    selectedNodeName = clickedNode.id;
+    updateUpgradeStats();
 }
-document.getElementById("recruitimg").addEventListener("click", () => {
+
+document.getElementById("Recruit").addEventListener("click", () => {
     selectNode(recruit);
 });
 
-document.getElementById("traineeimg").addEventListener("click", () => {
+document.getElementById("Trainee").addEventListener("click", () => {
     selectNode(trainee);
 });
 
-document.getElementById("veteranimg").addEventListener("click", () => {
+document.getElementById("Veteran").addEventListener("click", () => {
     selectNode(veteran);
 });
 
+selectNode(recruit);
+
+// Update the stats of the new node selected
+function updateUpgradeStats() {
+    if (selectedNodeName) {
+        const node = skillNodes[selectedNodeName];
+        document.getElementById("upgradestats").textContent = `Name: ${selectedNodeName}, Cost: ${node.cost}`;
+    } else {
+        document.getElementById("upgradestats").textContent = "Select a node to see details.";
+    }
+}
+
+// Buy a node
+document.getElementById("buyNode").addEventListener("click", () => {
+    if (selectedNodeName) {
+        unlockSkill(selectedNodeName);
+    } else {
+        console.log("No node selected.");
+    }
+});
 
 // Unlock skills
 function unlockSkill(skillname) {
@@ -72,13 +96,13 @@ function unlockSkill(skillname) {
 
     if (skill.unlocked === true) {
         console.log("Already Unlocked")
-
     } else {
 
         const prerequisitesMet = skill.prerequisites.every(prereq => skillNodes[prereq].unlocked);
         if (!prerequisitesMet) {
             console.log("Prerequisites not met");
             return;
+
         } else {
             if (gameState.starcount >= skill.cost) {
                 skill.unlocked = true;
@@ -92,8 +116,6 @@ function unlockSkill(skillname) {
     }
 }
 
-
-
 // Do effects here, export to main.js
 function applySkills() {
     if (skillNodes.Trainee.unlocked === true) {
@@ -102,38 +124,43 @@ function applySkills() {
             Gunner.maxlevel = 3;
         }
     }
-
 }
 
-
+// Creates the skill tree (poisitioning, lines, etc.)
 function createSkillTree(){
-    console.log("creating skilll treeee")
+
+    console.log("Constructing Skill tree")
+    const svg = document.getElementById("skillLines")
 
     Object.entries(skillNodes).forEach(([name, node]) => {
-    const el = document.querySelector(`.skill-node[data-skill="${name}"]`);
-    if (el) {
-        el.style.left = `${node.position[0].x}px`;
-        el.style.top = `${node.position[0].y}px`;
-        el.style.position = 'absolute';
-        console.log("Nodes maked")
-    }
-    });
-
-    Object.entries(skillNodes).forEach(([name, node]) => {
-    node.prerequisites.forEach(prereqName => {
-        const parent = skillNodes[prereqName];
-        const line = document.querySelector(`line[data-connection="${prereqName}-${name}"]`);
-        if (line) {
-        line.setAttribute('x1', parent.position[0].x + 60);
-        line.setAttribute('y1', parent.position[0].y + 25);
-        line.setAttribute('x2', node.position[0].x + 60);
-        line.setAttribute('y2', node.position[0].y + 25);
-        console.log("Lines Created")
+        const el = document.getElementById(name)
+        if (el) {
+            el.style.left = `${node.position[0].x}px`;
+            el.style.top = `${node.position[0].y}px`;
+            el.style.position = 'absolute';
+            el.title = node.description
+            console.log("Nodes maked")
         }
-    });
-    });    
-}
 
+        node.prerequisites.forEach(prereqName => {
+            const parent = skillNodes[prereqName];
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+
+            if (line) {
+                line.setAttribute("id", `${prereqName}-${name}`);
+                line.setAttribute("stroke-width", "2");
+                line.setAttribute("stroke", "#000000"); 
+                line.setAttribute('x1', parent.position[0].x + 50);
+                line.setAttribute('y1', parent.position[0].y);
+                line.setAttribute('x2', node.position[0].x + 50);
+                line.setAttribute('y2', node.position[0].y);
+                
+                svg.appendChild(line)
+                console.log("Lines Created")
+            }
+        });
+    });
+}
 
 // exports
 export { applySkills, createSkillTree }

@@ -1,3 +1,4 @@
+// Imports
 import { levelNumber } from "./Levelselect.js"
 import { checkWaveCleared } from "./Levelselect.js"
 import { createSkillTree } from "./skilltree.js"
@@ -13,16 +14,17 @@ function showScreen(screenToShow) {
 const buttons = document.getElementsByClassName("levelBtn");
 for (let button of buttons) {
     button.addEventListener("click", () => {
-        showScreen(gameScreen)
+        showScreen(gameScreen);
     });
 }
+
 document.getElementById("start").addEventListener("click", () => {
-    showScreen(levelSelectScreen)
+    showScreen(levelSelectScreen);
 });
 
 
 document.getElementById("goupgrade").addEventListener("click", () => {
-    showScreen(upgradeScreen)
+    showScreen(upgradeScreen);
     createSkillTree();
 });
 
@@ -30,13 +32,9 @@ const backButtons = document.querySelectorAll(".back");
 
 backButtons.forEach(button => {
     button.addEventListener("click", () => {
-        showScreen(titleScreen)
+        showScreen(titleScreen);
     });
 });
-
-
-
-
 
 // Exports
 export const canvas = document.getElementById("game");
@@ -52,7 +50,6 @@ export const waveDisplay = document.getElementById("wave");
 export const levelDisplay = document.getElementById("level");
 export const starDisplay = document.getElementById("stars");
 
-
 export let frameCount = 0;
 
 export const gameState = {
@@ -61,7 +58,7 @@ export const gameState = {
     money: 100,
     enemies: [],
     towers: [],
-    bullets : [],
+    bullets: [],
     path: [],
     gameRunning: false,
 }
@@ -72,7 +69,8 @@ const towerCosts = {
     tank: 150
 }
 
-// camp map images
+// IMAGES
+// Campaign Images
 const campaignmapimg = document.getElementById("campaignmapimg");
 campaignmapimg.src = "images/campaignmap.png";
 
@@ -93,13 +91,12 @@ shelldrakimg.src = "images/shelldrak.png";
 const speedlingimg = document.getElementById("speedlingimg");
 speedlingimg.src = "images/speedling.png";
 
-// Hiding Images
+// Hiding images after load
 gunnerimg.style.display = "none";
 tankimg.style.display = "none";
 swarmerimg.style.display = "none";
 shelldrakimg.style.display = "none";
 speedlingimg.style.display = "none";
-
 
 // Enemies
 class Enemy {
@@ -116,11 +113,12 @@ class Enemy {
     }
 
     move() {
-        if (this.pathIndex >= gameState.path.length - 1) return;
-            const target = gameState.path[this.pathIndex + 1];
-            const dx = target.x - this.x;
-            const dy = target.y - this.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+        if (this.pathIndex >= gameState.path.length - 1) {return;}
+
+        const target = gameState.path[this.pathIndex + 1];
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < this.speed) {
             this.x = target.x;
@@ -128,9 +126,8 @@ class Enemy {
             this.pathIndex++;
         
         if (this.pathIndex >= gameState.path.length - 1) {
-        // add lives going down there
+            // add lives going down there
             this.IsDead = true;
-        
         }
         
         } else {
@@ -141,7 +138,6 @@ class Enemy {
 
     draw() {
         ctx.drawImage(swarmerimg, this.x - 25, this.y - 25)
-
         this.drawHealthBar()
     }
     
@@ -166,11 +162,11 @@ class Sheller extends Enemy {
         this.isDead = false;
         this.reward = 20;
     }
-        draw() {
-            ctx.drawImage(shelldrakimg, this.x - 50, this.y - 50)
-            this.drawHealthBar()
-    }
     
+    draw() {
+        ctx.drawImage(shelldrakimg, this.x - 50, this.y - 50);
+        this.drawHealthBar();
+    }
 }
 
 class Speedling extends Enemy {
@@ -186,17 +182,14 @@ class Speedling extends Enemy {
         this.isDead = false;
         this.reward = 15;
     }
+
     draw() {
-        ctx.drawImage(speedlingimg, this.x - 25, this.y - 25)
-        this.drawHealthBar()
+        ctx.drawImage(speedlingimg, this.x - 25, this.y - 25);
+        this.drawHealthBar();
     }
-    
 }
 
-
-
-
-// towers
+// Towers
 class Gunner {
     constructor(x, y) {
         this.x = x;
@@ -210,22 +203,20 @@ class Gunner {
     }
 
     draw(selected = false) {
-        ctx.drawImage(gunnerimg, this.x - 25, this.y - 25)
+        ctx.drawImage(gunnerimg, this.x - 25, this.y - 25);
 
-    if (selected) {
-        ctx.strokeStyle = "yellow";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
-        
-        // range circle
-        ctx.strokeStyle = "rgba(0,0,255,0.3)";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
-        ctx.stroke();
-
+        if (selected) {
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(this.x - 18, this.y - 18, 36, 36);
+            
+            // range circle
+            ctx.strokeStyle = "rgba(0,0,255,0.3)";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
+            ctx.stroke();
+        }
     }
-    }
-
 
     canShoot() {
         return this.counter === 0;
@@ -252,7 +243,7 @@ class Tank extends Gunner {
     }
     
     draw(selected = false) {
-        ctx.drawImage(tankimg, this.x - 50, this.y - 50)
+        ctx.drawImage(tankimg, this.x - 50, this.y - 50);
 
     if (selected) {
         ctx.strokeStyle = "yellow";
@@ -273,31 +264,41 @@ class Tank extends Gunner {
     }
 }
 
-let selectedTowerType = null
+// Selecting a tower
+const gunnerbtn = document.getElementById("gunner");
+const tankbtn = document.getElementById("tank");
 
-
-// ForEach optimize code
-const gunnerbtn = document.getElementById("gunner")
-const tankbtn = document.getElementById("tank")
-
+let sameTowerSelected = false;
+let selectedTowerType = null;
 
 function selectTowerBtn(selectedTowerBtn) {
     const selectedTowerBtns = [gunnerbtn, tankbtn];
-    selectedTowerBtns.forEach(stBtn => {
-        stBtn.style.border = (stBtn === selectedTowerBtn) ? "2px solid yellow" : "2px solid gray";
-        selectedTowerType = selectedTowerBtn.id;
-    });
+
+    if (selectedTowerBtn.id === selectedTowerType && sameTowerSelected === true) { // If the tower selected is the same
+        selectedTowerBtns.forEach(stBtn => {
+            stBtn.style.border = "2px solid gray";
+        });
+
+        sameTowerSelected = false; 
+    } else {
+        selectedTowerBtns.forEach(stBtn => {
+            stBtn.style.border = (stBtn === selectedTowerBtn) ? "2px solid yellow" : "2px solid gray";
+            selectedTowerType = selectedTowerBtn.id;
+        });
+
+        sameTowerSelected = true;
+    }
 }
 
 gunnerbtn.addEventListener("click", () => {
-    selectTowerBtn(gunnerbtn)
+    selectTowerBtn(gunnerbtn);
 });
 
 tankbtn.addEventListener("click", () => {
-    selectTowerBtn(tankbtn)
+    selectTowerBtn(tankbtn);
 });
 
-selectTowerBtn(gunnerbtn)
+selectTowerBtn(gunnerbtn);
 
 // Bullets
 class Bullet {
@@ -312,8 +313,8 @@ class Bullet {
 
     move() {
         if (!this.target || this.target.isDead) {
-        this.isHit = true;
-        return;
+            this.isHit = true;
+            return;
         }
 
         const dx = this.target.x - this.x;
@@ -321,10 +322,10 @@ class Bullet {
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (dist < this.speed) {
-        this.hitTarget();
+            this.hitTarget();
         } else {
-        this.x += (dx / dist) * this.speed;
-        this.y += (dy / dist) * this.speed;
+            this.x += (dx / dist) * this.speed;
+            this.y += (dy / dist) * this.speed;
         }
     }
 
@@ -333,9 +334,9 @@ class Bullet {
         const truedamage = Math.max(0, damage - this.target.def);
         this.target.hp -= truedamage;
         if (this.target.hp <= 0) {
-        this.target.isDead = true;
-        gameState.money += this.target.reward;
-        updateMoney();
+            this.target.isDead = true;
+            gameState.money += this.target.reward;
+            updateMoney();
         }
         this.isHit = true;
     }
@@ -353,12 +354,12 @@ class TankBullet extends Bullet {
         super(x, y, target);
         this.speed = 2;
         this.radius = 7;
-        this.splashRadius = 30; // splash damage radius in pixels
+        this.splashRadius = 50; // splash damage radius in pixels
     }
 
     hitTarget() {
         this.target.hp -= 6 - this.target.def;  
-        if (this.target.hp <= 0) this.target.isDead = true;
+        if (this.target.hp <= 0) { this.target.isDead = true;}
         
         gameState.enemies.forEach(enemy => {
         if (enemy !== this.target) {
@@ -367,8 +368,9 @@ class TankBullet extends Bullet {
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist <= this.splashRadius) {
-            enemy.hp -= 2 - enemy.def; // splash damage = 5
-            if (enemy.hp <= 0) enemy.isDead = true;
+                enemy.hp -= 2 - enemy.def; // splash damage = 5
+
+            if (enemy.hp <= 0) {enemy.isDead = true;}
             }
         }
         });
@@ -379,7 +381,6 @@ class TankBullet extends Bullet {
             gameState.money += enemy.reward;
         }
         });
-    
         updateMoney();
         this.isHit = true;
     }
@@ -410,7 +411,7 @@ function updateStars() {
 }
 
 // Place towers by tapping/clicking
-
+const sellButton = document.getElementById("selltower");
 let selectedTower = null;
 
 function isPointInTower(x, y, tower) {
@@ -422,6 +423,14 @@ function isPointInTower(x, y, tower) {
     )
 }
 
+function isPointInEnemy(x, y, enemy) {
+    return (
+        x >= enemy.x - 30 &&
+        x <= enemy.x + 30 &&
+        y >= enemy.y - 30 &&
+        y <= enemy.y + 30
+    )
+}
 
 canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -429,20 +438,24 @@ canvas.addEventListener("click", (e) => {
     const y = e.clientY - rect.top;
     
     let clickedOnTower = false;
-
     // Check if clicked on a tower to select/sell
     for (let i = 0; i < gameState.towers.length; i++) {
         if (isPointInTower(x, y, gameState.towers[i])) {
         selectedTower = gameState.towers[i];
         clickedOnTower = true;
         
-        sellButton.style.position ="absolute"
-        sellButton.style.display ="block"
+        sellButton.style.position ="absolute";
+        sellButton.style.display ="block";
         sellButton.style.left = (rect.left + selectedTower.x + 20 ) + "px";
         sellButton.style.top = (rect.top + selectedTower.y + 20 ) + "px";
         
-        
         break;
+        }
+    }
+
+    for (let i = 0; i < gameState.enemies.length; i++) {
+        if (isPointInEnemy(x, y, gameState.enemies[i])) {
+            console.log("Enemy has been clicked");
         }
     }
 
@@ -450,21 +463,17 @@ canvas.addEventListener("click", (e) => {
     if (!clickedOnTower) {
         sellButton.style.display = "none";
         selectedTower = null;
-        if (selectedTowerType && gameState.money >= towerCosts[selectedTowerType]) {
-        let newTower;
-        if (selectedTowerType === "gunner") newTower = new Gunner(x, y);
-        else if (selectedTowerType === "tank") newTower = new Tank(x, y);
-        
-        gameState.towers.push(newTower);
-        gameState.money -= towerCosts[selectedTowerType];
-        updateMoney();
-        } else {
-        alert("Not enough money or no tower selected!");
+        if (selectedTowerType && gameState.money >= towerCosts[selectedTowerType] && sameTowerSelected === true) {
+            let newTower;
+            if (selectedTowerType === "gunner") newTower = new Gunner(x, y);
+            else if (selectedTowerType === "tank") newTower = new Tank(x, y);
+            
+            gameState.towers.push(newTower);
+            gameState.money -= towerCosts[selectedTowerType];
+            updateMoney();
         }
     }
 });
-
-const sellButton = document.getElementById("selltower");
 
 sellButton.addEventListener("click", () => {
     if (selectedTower) {
@@ -482,7 +491,6 @@ sellButton.addEventListener("click", () => {
     }
 });
 
-
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -497,16 +505,15 @@ function gameLoop() {
         tower.update(); 
 
         for (const enemy of gameState.enemies) {
-        const dx = enemy.x - tower.x;
-        const dy = enemy.y - tower.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+            const dx = enemy.x - tower.x;
+            const dy = enemy.y - tower.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
         
         if (dist <= tower.range && tower.canShoot()) {
             tower.shoot(enemy);
             break; // shoot only one enemy per update
         }
         }
-
         tower.draw(tower === selectedTower);
     });
 
@@ -517,7 +524,6 @@ function gameLoop() {
         bullet.draw();
     });
 
-
     frameCount++;
     requestAnimationFrame(gameLoop);
 
@@ -525,12 +531,10 @@ function gameLoop() {
         checkWaveCleared();
         updateWaves();
     }
-
 }
 
 // Hide Stuff
-showScreen(titleScreen)
-
+showScreen(titleScreen);
 sellButton.style.display = "none";
 
 // Stuff
@@ -539,12 +543,10 @@ gameLoop();
 
 export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
 export { updateMoney, updateLevel, updateStars, showScreen }
-
 /* Version history
-V1.12.1 - Selecting buttons lights em up and selecting a tower ONLY shows their range circle
-V1.12.2 - Optizimized code
-V1.13 - Added skill tree with 3 different upgrades
-V1.13.1 - Improved skill tree
-V1.13.2 - Optimized skill tree code
-V1.13.3 - Selecting nodes works
-*/
+V1.13.4 - Further optimized node creation code
+V1.14 - Added bottom part with name of nodes and cost when selecting a node
+V1.14.1 - Fixed error with lines
+V1.14.2 - Made it so you can unselect (and it doesn't place) and reselect a tower 
+V1.14.3 - Cleaned up code (also buffed tank splash from 30 to 50s)
+*/ 

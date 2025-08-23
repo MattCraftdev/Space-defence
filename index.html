@@ -17,17 +17,23 @@
     <nav id = "upgrades">
         <svg id="skillLines" width="2000" height="2000" style= "position:absolute; top:0; left:0; z-index:0;"></svg>
 
-        <img id = "recruitimg" class = "skill-node" data-skill="Recruit" alt = "recruitimage">
-        <img id = "traineeimg" class = "skill-node" data-skill="Trainee" alt = "traineeimage">
-        <img id = "veteranimg" class = "skill-node" data-skill="Veteran" alt = "veteranimage">
+        <img id = "Recruit" class = "skill-node" alt = "recruitimage">
+        <img id = "Trainee" class = "skill-node" alt = "traineeimage">
+        <img id = "Veteran" class = "skill-node" alt = "veteranimage">
 
+        <svg>
+            <line id="Recruit-Trainee" />
+            <line id="Trainee-Veteran" />
+        </svg>
 
-
+        <div id = "upgradestatholder">
+            <h1>Upgrades</h1>
+            <p>Stars: <span id = "stars">0</span></p>
+            <p id = "upgradestats"></p>
+            <button id = "buyNode">Buy</button>
+            <button class = "back">back</button>            
+        </div>
         
-        <h1 id = "upgradesheader">Upgrades</h1>
-        <p>Stars: <span id = "stars">0</span></p>
-        <button class = "back" id = "upgradesback">back</button>
-
     </nav>
   
     <nav id = "levelSelect">
@@ -40,7 +46,6 @@
         <button class = "back" id = "back">back</button>
     </nav>
 
-
     <nav id = "playing">
         <h1>Tower Defense</h1>
         <p>Money: <span id="money"> 100</span></p>
@@ -48,9 +53,8 @@
         <p>Level: <span id = "level">1</span></p>
         
         <section id = "canvascontainer">
-        <canvas id = "game" width = "800" height = "600" style = "z-index: 1"></canvas>
-        
-        <canvas id = "path" width = "800" height = "600" style = "z-index: 0"></canvas>
+            <canvas id = "game" width = "800" height = "600" style = "z-index: 1"></canvas>
+            <canvas id = "path" width = "800" height = "600" style = "z-index: 0"></canvas>
         </section>
         
         <button id ="selltower" style = "z-index: 2">Sell tower</button>
@@ -59,13 +63,9 @@
         <button id = "tank" style = "z-index: 3">Tank - $150</button>
     </nav>
   
-
-
     <script src="main.js" type = "module"></script>
     <script src="Levelselect.js" type = "module"></script>
     <script src="skilltree.js" type = "module"></script>
-
-
 
     <img id = "gunnerimg" alt = "gunnerimage">
     <img id = "tankimg" alt = "tankimage">
@@ -73,7 +73,6 @@
     <img id = "swarmerimg" alt = "swarmerimage">
     <img id = "shelldrakimg" alt = "shelldrakimage">
     <img id = "speedlingimg" alt = "speedlingimage">
-
 
 </html>
 </body>

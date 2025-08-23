@@ -1,6 +1,8 @@
+// Declaring context
 const pathCanvas = document.getElementById("path")
 const ctx2 = pathCanvas.getContext("2d")
 
+// Imports
 import {
     Enemy, Sheller, Speedling,
     gameState,
@@ -10,13 +12,12 @@ import {
 import { updateMoney, updateStars, updateLevel, showScreen } from './main.js'
 import { applySkills } from './skilltree.js'
 
-
+// Showing levelselectscreen
 document.getElementById("start").addEventListener("click", () => {
     showScreen(levelSelectScreen)
 });
 
 let levelNumber = 1
-
 // Levels + data
 const levels = [
     {
@@ -25,7 +26,7 @@ const levels = [
         unlocked: true,
         hearts: 50,
         levelStars: 0,
-        startMoney: 100,
+        startMoney: 150,
         map: "grass",
         maxwaves: 5,
         path: [{x:0,y:300},{x:800,y:300}],
@@ -158,15 +159,14 @@ const levels = [
     }
     ];
 
-// ====== Game Variables ======
+// Game functions
 let currentLevel = null;
 
- 
 function drawPath() {
     ctx2.clearRect(0, 0, 800, 600);
 
+    // Draws maps
     ctx2.fillStyle = "lightgreen";
-    console.log(currentLevel)
     if (currentLevel.map === "desert") {ctx2.fillStyle = "sandybrown"}
     else if (currentLevel.map === "snow") {ctx2.fillStyle = "lightblue" }
     else if (currentLevel.map === "city") {ctx2.fillStyle = "lightgray"}
@@ -185,8 +185,6 @@ function drawPath() {
     console.log("Path has been drawn")
 }
 
-
-
 function loadLevel(selectedLevel) {
     currentLevel = selectedLevel;
     console.log(currentLevel)
@@ -201,19 +199,15 @@ function loadLevel(selectedLevel) {
     gameState.gameRunning = true;
     
     applySkills();
-
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
             
     document.getElementById("path").style.display = "block";
-        
     console.log(`Loading ${selectedLevel.name} with map: ${selectedLevel.map}`);
     updateMoney();
     drawPath();
     startWave();
 }
 
-
-// waves
 function startWave() {
     if (gameState.wave > currentLevel.maxwaves && gameState.enemies.length === 0) {
         levelCompleted();
@@ -229,9 +223,7 @@ function startWave() {
 }
 
 
-
-
-// Functions
+// More Functions
 function checkWaveCleared() { // Delay between waves
     if (gameState.enemies.length === 0) {
         setTimeout(() => {
@@ -246,14 +238,6 @@ function getCurrentPath() {
 }
 
 function levelCompleted() {
-
-    // Varible resetting 
-    gameState.wave = 1;
-    gameState.money = 100;
-    gameState.enemies = [];
-    gameState.towers = [];
-    gameState.bullets = [];
-    gameState.path = [];
     gameState.gameRunning = false;
 
     ctx2.clearRect(0, 0, pathCanvas.width, pathCanvas.height);
@@ -298,8 +282,6 @@ export { checkWaveCleared }
 // Hiding buttons
 document.getElementById("level2Btn").style.display = "none";
 document.getElementById("level3Btn").style.display = "none";
-
-
 
 // Loading levels per button
 document.getElementById("level1Btn").addEventListener("click", () => {
