@@ -17,21 +17,24 @@ veteranimg.src = "images/veteran.png";
 const skillNodes = {
 
     "Recruit": {
-        description: " I'm the new recruit.. [Unlocks Gunner] ",
+        description: "I'm the new recruit..",
+        does: "Unlocks Gunner",
         unlocked: true,
         cost: 0,
         prerequisites: [],
         position: [ { x: 50, y: 100 } ]
     },
     "Trainee": {
-        description: " I'm better, but not better enough! [Level 2 Gunner available!] ",
+        description: " I'm better, but not better enough!",
+        does: "Level 2 Gunner unlocked!",
         unlocked: false,
         cost: 1,
         prerequisites: ["Recruit"],
         position: [ { x: 50, y: 300 } ]
     },
     "Veteran": {
-        description: " This job sucks [Level 3 Gunner available!] ",
+        description: " This job sucks...",
+        does: "Level 3 Gunner available!",
         unlocked: false,
         cost: 2,
         prerequisites: ["Trainee"],
@@ -40,7 +43,7 @@ const skillNodes = {
 }
 
 // Clicking images to unlock stuff
-let selectedNode = null;
+
 let selectedNodeName = null;
 
 const recruit = document.getElementById("Recruit");
@@ -75,7 +78,7 @@ selectNode(recruit);
 function updateUpgradeStats() {
     if (selectedNodeName) {
         const node = skillNodes[selectedNodeName];
-        document.getElementById("upgradestats").textContent = `Name: ${selectedNodeName}, Cost: ${node.cost}`;
+        document.getElementById("upgradestats").textContent = `Description: ${node.description}, Effect: ${node.does}`;
     } else {
         document.getElementById("upgradestats").textContent = "Select a node to see details.";
     }
@@ -109,6 +112,12 @@ function unlockSkill(skillname) {
                 gameState.starcount -= skill.cost;
                 updateStars();
                 console.log("Bought upgrade!");
+                const el = document.getElementById(skillname);
+                if (el) el.classList.add("unlocked");
+
+                const label = [...document.querySelectorAll(".skill-label")]
+                    .find(p => p.textContent.includes(skillname));
+                if (label) label.textContent = `${skillname}, Purchased`;
             } else {
                 console.log("You're poor.")
             }
@@ -128,17 +137,18 @@ function applySkills() {
 
 // Creates the skill tree (poisitioning, lines, etc.)
 function createSkillTree(){
-
     console.log("Constructing Skill tree")
     const svg = document.getElementById("skillLines")
 
     Object.entries(skillNodes).forEach(([name, node]) => {
-        const el = document.getElementById(name)
+        const el = document.getElementById(name);
         if (el) {
             el.style.left = `${node.position[0].x}px`;
             el.style.top = `${node.position[0].y}px`;
             el.style.position = 'absolute';
-            el.title = node.description
+            if (node.unlocked === true) {
+                el.classList.add("unlocked")
+            }
             console.log("Nodes maked")
         }
 
@@ -159,8 +169,34 @@ function createSkillTree(){
                 console.log("Lines Created")
             }
         });
+
+        // Creating cost and title below
+        const p = document.createElement("p")
+        p.classList.add("skill-label")
+        p.style.position = "absolute";
+        p.style.left = `${node.position[0].x - 10}px`;
+        p.style.top = `${node.position[0].y + 105}px`;
+
+
+
+        if (node.unlocked === true) {      
+            p.textContent = `${name}, Purchased`;
+        } else if (node.cost === 0) {
+            p.textContent = `${name}, free`;
+        } else {
+            p.textContent = `${name}, $${node.cost}`;
+        }
+
+        
+
+        document.body.appendChild(p);
     });
 }
+
+// Deletes P elements created when leaving skilltree
+document.getElementById("bfromskil").addEventListener("click", () => {
+    document.querySelectorAll(".skill-label").forEach(el => el.remove());
+});
 
 // exports
 export { applySkills, createSkillTree }

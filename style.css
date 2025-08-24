@@ -77,6 +77,12 @@ canvas {
     left: 590px; 
 }
 
+#level4Btn {
+    position: absolute;
+    top: 175px;
+    left: 700px; 
+}   
+
 #back {
     position: absolute;
     bottom: 50px;

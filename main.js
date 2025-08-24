@@ -49,6 +49,8 @@ export const moneyDisplay = document.getElementById("money");
 export const waveDisplay = document.getElementById("wave");
 export const levelDisplay = document.getElementById("level");
 export const starDisplay = document.getElementById("stars");
+export const heartDisplay = document.getElementById("hearts");
+
 
 export let frameCount = 0;
 
@@ -59,8 +61,8 @@ export const gameState = {
     enemies: [],
     towers: [],
     bullets: [],
-    path: [],
     gameRunning: false,
+    currenthearts: 50,
 }
 
 // Tower costs
@@ -105,17 +107,16 @@ class Enemy {
         this.hp = 10;
         this.maxHp = 10;
         this.def = 0;
+        this.heartscost = 2;
         this.pathIndex = 0;
-        this.x = gameState.path[0].x;
-        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 10;
     }
 
     move() {
-        if (this.pathIndex >= gameState.path.length - 1) {return;}
+        if (this.pathIndex >= this.path.length - 1) { return; }
 
-        const target = gameState.path[this.pathIndex + 1];
+        const target = this.path[this.pathIndex + 1];
         const dx = target.x - this.x;
         const dy = target.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -125,9 +126,10 @@ class Enemy {
             this.y = target.y;
             this.pathIndex++;
         
-        if (this.pathIndex >= gameState.path.length - 1) {
-            // add lives going down there
-            this.IsDead = true;
+        if (this.pathIndex >= this.path.length - 1) {
+            gameState.currenthearts -= this.heartscost;
+            this.isDead = true;
+            updateHearts()
         }
         
         } else {
@@ -156,9 +158,8 @@ class Sheller extends Enemy {
         this.hp = 20;
         this.maxHp = 20;
         this.def = 1;
+        this.heartscost = 5;
         this.pathIndex = 0;
-        this.x = gameState.path[0].x;
-        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 20;
     }
@@ -176,9 +177,8 @@ class Speedling extends Enemy {
         this.hp = 8;
         this.maxHp = 8;
         this.def = 0;
+        this.heartscost = 3;
         this.pathIndex = 0;
-        this.x = gameState.path[0].x;
-        this.y = gameState.path[0].y;
         this.isDead = false;
         this.reward = 15;
     }
@@ -410,6 +410,10 @@ function updateStars() {
     starDisplay.textContent = gameState.starcount
 }
 
+function updateHearts() {
+    heartDisplay.textContent = gameState.currenthearts
+}
+
 // Place towers by tapping/clicking
 const sellButton = document.getElementById("selltower");
 let selectedTower = null;
@@ -530,6 +534,11 @@ function gameLoop() {
     if (gameState.gameRunning === true) {
         checkWaveCleared();
         updateWaves();
+        if (gameState.currenthearts <= 0) {
+            alert("Game Over :(")
+            gameState.gameRunning = false;
+            return;
+        }
     }
 }
 
@@ -542,11 +551,14 @@ updateMoney();
 gameLoop();
 
 export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
-export { updateMoney, updateLevel, updateStars, showScreen }
+export { updateMoney, updateLevel, updateStars, updateHearts, showScreen }
 /* Version history
-V1.13.4 - Further optimized node creation code
-V1.14 - Added bottom part with name of nodes and cost when selecting a node
-V1.14.1 - Fixed error with lines
-V1.14.2 - Made it so you can unselect (and it doesn't place) and reselect a tower 
-V1.14.3 - Cleaned up code (also buffed tank splash from 30 to 50s)
+V1.14.4 - Shows cost and name of each node (next to node) and put description and effect when clicking on a node
+V1.14.5 - Fixed a few things with node and improved quality
+V1.14.6 - Now when you unlock upgrades, it says purchased :D
+V1.15 - Updated path mechanics, added more paths possible
+V1.15.1 - Finally added the hearts system so you can LOSE
+V1.15.2 - Fixed a few displaying bugs and some other annoying bugs (around 4 or 5 total)
+V1.16 - Added level 4 offically
+V1.16.1 - Modified original levels and did more stuff :0
 */ 
