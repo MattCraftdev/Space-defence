@@ -48,21 +48,29 @@
     </nav>
 
     <nav id = "playing">
-        <h1>Tower Defense</h1>
-        <p>Money: <span id="money"> 100</span></p>
-        <p>Wave: <span id = "wave">1</span></p>
-        <p>Level: <span id = "level">1</span></p>
-        <p>Hearts: <span id = "hearts">50</span></p>
-        
+
+        <section id = "infocontainer">
+            <p>Money: <span id="money">100</span></p>
+            <p>Wave: <span id = "wave">1</span></p>
+            <p>Hearts: <span id = "hearts">50</span></p>
+            <p>Level: <span id = "level">1</span></p>
+            
+            <br>
+            <p id = "infopanel"></p>
+
+            <button id = "gunner">Gunner - $50</button>
+            <button id = "tank">Tank - $150</button>
+        </section>
+
         <section id = "canvascontainer">
             <canvas id = "game" width = "800" height = "600" style = "z-index: 1"></canvas>
             <canvas id = "path" width = "800" height = "600" style = "z-index: 0"></canvas>
         </section>
         
-        <button id ="selltower" style = "z-index: 2">Sell tower</button>
+        <button id = "selltower" style = "z-index: 2">Sell Tower</button>
+        <button id = "upgradetower" style = "z-index: 2">Upgrade Tower</button>
     
-        <button id = "gunner" style = "z-index: 3">Gunner - $50</button>
-        <button id = "tank" style = "z-index: 3">Tank - $150</button>
+
     </nav>
   
     <script src="main.js" type = "module"></script>

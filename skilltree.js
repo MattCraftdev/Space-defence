@@ -1,3 +1,4 @@
+"use strict";
 // Imports
 import { gameState } from './main.js'
 import { updateStars } from './main.js'
@@ -177,8 +178,6 @@ function createSkillTree(){
         p.style.left = `${node.position[0].x - 10}px`;
         p.style.top = `${node.position[0].y + 105}px`;
 
-
-
         if (node.unlocked === true) {      
             p.textContent = `${name}, Purchased`;
         } else if (node.cost === 0) {
@@ -186,8 +185,6 @@ function createSkillTree(){
         } else {
             p.textContent = `${name}, $${node.cost}`;
         }
-
-        
 
         document.body.appendChild(p);
     });

@@ -1,3 +1,4 @@
+"use strict";
 // Declaring context
 const pathCanvas = document.getElementById("path")
 const ctx2 = pathCanvas.getContext("2d")
@@ -33,51 +34,14 @@ const levels = [
         waves: [
         [ { type: 'Enemy', count: 2, place: 'main' } ],
         
-        [ { type: 'Enemy', count: 4, place: 'main' } ],
+        [ { type: 'Enemy', count: 6, place: 'main' } ],
         
         [ { type: 'Enemy', count: 10, place: 'main' } ],
         
-        [ { type: 'Enemy', count: 1, place: 'main' } ],
+        [ { type: 'Enemy', count: 15, place: 'main' } ],
         
-
-        ], spawnPattern: function() {
-           if (gameState.gameRunning === true) {
-            const currentWaveData = this.waves[gameState.wave - 1];
-            let delay = 0;
-
-            currentWaveData.forEach(enemyGroup => {
-            for (let i = 0; i < enemyGroup.count; i++) {
-                setTimeout(() => {
-                    let enemy;
-                    if (enemyGroup.type === 'Enemy') { enemy = new Enemy(); }
-                    else if (enemyGroup.type === 'Sheller') { enemy = new Sheller(); }
-                    else if (enemyGroup.type === 'Speedling') { enemy = new Speedling(); }
-
-                    const targetPath = currentLevel.path.find(p => p.id === enemyGroup.place) || currentLevel.path[0];
-                    enemy.path = targetPath.points;
-                    enemy.pathIndex = 0;
-                    if (enemy.path.length > 0) {
-                    enemy.x = enemy.path[0].x;
-                    enemy.y = enemy.path[0].y;
-                    }
-
-                    console.log(`Spawning ${enemyGroup.type} on path ${enemyGroup.place}`);
-
-                    gameState.enemies.push(enemy);
-                    
-                    if (isNaN(enemy.x) || isNaN(enemy.y)) {
-                        console.warn("Enemy has invalid position:", this);
-                        return;
-                    }
-                }, delay);
-
-                delay += 2000; // adjust delay between spawns
-                }
-            });
-            }
-        }
+        ]
     },
-
     {
         id: 2,
         name: "Second Contact",
@@ -103,43 +67,7 @@ const levels = [
 
         [ { type: 'Enemy', count: 5, place: 'main' }, { type: 'Sheller', count: 2, place: 'main' } ],
 
-        ], spawnPattern: function() {
-           if (gameState.gameRunning === true) {
-            const currentWaveData = this.waves[gameState.wave - 1];
-            let delay = 0;
-
-            currentWaveData.forEach(enemyGroup => {
-            for (let i = 0; i < enemyGroup.count; i++) {
-                setTimeout(() => {
-                    let enemy;
-                    if (enemyGroup.type === 'Enemy') { enemy = new Enemy(); }
-                    else if (enemyGroup.type === 'Sheller') { enemy = new Sheller(); }
-                    else if (enemyGroup.type === 'Speedling') { enemy = new Speedling(); }
-
-                    const targetPath = currentLevel.path.find(p => p.id === enemyGroup.place) || currentLevel.path[0];
-                    enemy.path = targetPath.points;
-                    enemy.pathIndex = 0;
-                    if (enemy.path.length > 0) {
-                    enemy.x = enemy.path[0].x;
-                    enemy.y = enemy.path[0].y;
-                    }
-
-                    console.log(`Spawning ${enemyGroup.type} on path ${enemyGroup.place}`);
-
-                    gameState.enemies.push(enemy);
-                    
-                    if (isNaN(enemy.x) || isNaN(enemy.y)) {
-                        console.warn("Enemy has invalid position:", this);
-                        return;
-                    }
-                }, delay);
-                delay += 2000; // adjust delay between spawns
-                }
-            });
-            }
-        }
-
-
+        ]
     },
     {
         id: 3,
@@ -174,43 +102,7 @@ const levels = [
 
         [ { type: 'Enemy', count: 5, place: 'main' }, { type: 'Sheller', count: 3, place: 'secondary' }, { type: 'Speedling', count: 10, place: 'main' } ],
 
-        ], spawnPattern: function() {
-           if (gameState.gameRunning === true) {
-            const currentWaveData = this.waves[gameState.wave - 1];
-            let delay = 0;
-
-            currentWaveData.forEach(enemyGroup => {
-            for (let i = 0; i < enemyGroup.count; i++) {
-                setTimeout(() => {
-                    let enemy;
-                    if (enemyGroup.type === 'Enemy') { enemy = new Enemy(); }
-                    else if (enemyGroup.type === 'Sheller') { enemy = new Sheller(); }
-                    else if (enemyGroup.type === 'Speedling') { enemy = new Speedling(); }
-
-                    const targetPath = currentLevel.path.find(p => p.id === enemyGroup.place) || currentLevel.path[0];
-                    enemy.path = targetPath.points;
-                    enemy.pathIndex = 0;
-                    if (enemy.path.length > 0) {
-                    enemy.x = enemy.path[0].x;
-                    enemy.y = enemy.path[0].y;
-                    }
-
-                    console.log(`Spawning ${enemyGroup.type} on path ${enemyGroup.place}`);
-
-                    gameState.enemies.push(enemy);
-                    
-                    if (isNaN(enemy.x) || isNaN(enemy.y)) {
-                        console.warn("Enemy has invalid position:", this);
-                        return;
-                    }
-                }, delay);
-                delay += 2000; // adjust delay between spawns
-                }
-            });
-            }
-        }
-
-
+        ]
     },
     {
         id: 4,
@@ -246,45 +138,9 @@ const levels = [
 
         [ { type: 'Enemy', count: 5, place: 'main' }, { type: 'Sheller', count: 2, place: 'main' }, { type: 'Speedling', count: 10, place: 'main' } ],
 
-        ], spawnPattern: function() {
-           if (gameState.gameRunning === true) {
-            const currentWaveData = this.waves[gameState.wave - 1];
-            let delay = 0;
-
-            currentWaveData.forEach(enemyGroup => {
-            for (let i = 0; i < enemyGroup.count; i++) {
-                setTimeout(() => {
-                    let enemy;
-                    if (enemyGroup.type === 'Enemy') { enemy = new Enemy(); }
-                    else if (enemyGroup.type === 'Sheller') { enemy = new Sheller(); }
-                    else if (enemyGroup.type === 'Speedling') { enemy = new Speedling(); }
-
-                    const targetPath = currentLevel.path.find(p => p.id === enemyGroup.place) || currentLevel.path[0];
-                    enemy.path = targetPath.points;
-                    enemy.pathIndex = 0;
-                    if (enemy.path.length > 0) {
-                    enemy.x = enemy.path[0].x;
-                    enemy.y = enemy.path[0].y;
-                    }
-
-                    console.log(`Spawning ${enemyGroup.type} on path ${enemyGroup.place}`);
-
-                    gameState.enemies.push(enemy);
-                    
-                    if (isNaN(enemy.x) || isNaN(enemy.y)) {
-                        console.warn("Enemy has invalid position:", this);
-                        return;
-                    }
-                }, delay);
-                delay += 2000; // adjust delay between spawns
-                }
-            });
-            }
-        }
-
-
+        ],
     }
-    ];
+];
 
 // Game functions
 let currentLevel = null;
@@ -339,6 +195,43 @@ function loadLevel(selectedLevel) {
     startWave();
 }
 
+function gameSpawn() {
+    if (gameState.gameRunning === true) {
+        const currentWaveData = currentLevel.waves[gameState.wave - 1];
+        let delay = 0;
+
+    currentWaveData.forEach(enemyGroup => {
+    for (let i = 0; i < enemyGroup.count; i++) {
+        setTimeout(() => {
+            let enemy;
+            if (enemyGroup.type === 'Enemy') { enemy = new Enemy(); }
+            else if (enemyGroup.type === 'Sheller') { enemy = new Sheller(); }
+            else if (enemyGroup.type === 'Speedling') { enemy = new Speedling(); }
+
+            const targetPath = currentLevel.path.find(p => p.id === enemyGroup.place) || currentLevel.path[0];
+            enemy.path = targetPath.points;
+            enemy.pathIndex = 0;
+            
+            if (enemy.path.length > 0) {
+            enemy.x = enemy.path[0].x;
+            enemy.y = enemy.path[0].y;
+            }
+
+            console.log(`Spawning ${enemyGroup.type} on path ${enemyGroup.place}`);
+            gameState.enemies.push(enemy);
+                    
+            if (isNaN(enemy.x) || isNaN(enemy.y)) {
+                console.warn("Enemy has invalid position:", this);
+                return;
+            }
+
+        }, delay);
+        delay += 2000; // adjust delay between spawns
+        }
+    });
+    }
+}
+
 function startWave() {
     if (gameState.gameRunning === true) {
         if (gameState.wave > currentLevel.maxwaves && gameState.enemies.length === 0) {
@@ -346,9 +239,9 @@ function startWave() {
         }
             if (gameState.enemies.length === 0) { // If no enemies, do spawning basically
                 // console.log(currentLevel)
-                currentLevel.spawnPattern();
+                gameSpawn(currentLevel);
                 gameState.wave++;
-                console.log("Wave passing!")
+                console.log("Wave passing!");
             }
     }
 
@@ -381,7 +274,7 @@ function levelCompleted() {
     calculateStars();
 }
 
-// calculate stars
+// Calculate stars
 function calculateStars() {
     const heartsLeft = gameState.currenthearts
     let starsEarned = currentLevel.levelStars

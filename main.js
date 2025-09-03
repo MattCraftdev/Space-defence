@@ -1,3 +1,4 @@
+"use strict";
 // Imports
 import { levelNumber } from "./Levelselect.js"
 import { checkWaveCleared } from "./Levelselect.js"
@@ -63,6 +64,7 @@ export const gameState = {
     bullets: [],
     gameRunning: false,
     currenthearts: 50,
+    starcount: 0,
 }
 
 // Tower costs
@@ -111,6 +113,7 @@ class Enemy {
         this.pathIndex = 0;
         this.isDead = false;
         this.reward = 10;
+        this.name = "Swarmer";
     }
 
     move() {
@@ -162,6 +165,7 @@ class Sheller extends Enemy {
         this.pathIndex = 0;
         this.isDead = false;
         this.reward = 20;
+        this.name = "Sheller";
     }
     
     draw() {
@@ -181,6 +185,7 @@ class Speedling extends Enemy {
         this.pathIndex = 0;
         this.isDead = false;
         this.reward = 15;
+        this.name = "Speedling";
     }
 
     draw() {
@@ -198,6 +203,7 @@ class Gunner {
         this.fireRate = 40; // frames between shots
         this.level = 1;
         this.maxlevel = 1;
+        this.dmg = 2;
         this.counter = 0;
         this.type = "gunner"
     }
@@ -223,12 +229,19 @@ class Gunner {
     }
 
     shoot(enemy) {
-        gameState.bullets.push(new Bullet(this.x, this.y, enemy));
+        gameState.bullets.push(new Bullet(this.x, this.y, enemy, this.dmg));
         this.counter = this.fireRate;
     }
 
     update() {
         if (this.counter > 0) this.counter--;
+    }
+
+    upgrade() {
+        this.level += 1;
+        this.fireRate += 10;
+        this.range += 10;
+        this.dmg += 2;
     }
 }
 
@@ -259,7 +272,7 @@ class Tank extends Gunner {
     }
     
     shoot(enemy) {
-        gameState.bullets.push(new TankBullet(this.x, this.y , enemy));
+        gameState.bullets.push(new TankBullet(this.x, this.y , enemy, this.dmg));
         this.counter = this.fireRate;
     }
 }
@@ -302,10 +315,11 @@ selectTowerBtn(gunnerbtn);
 
 // Bullets
 class Bullet {
-    constructor(x, y, target) {
+    constructor(x, y, target, dmg) {
         this.x = x;
         this.y = y;
         this.target = target;
+        this.dmg = dmg;
         this.speed = 6;
         this.radius = 5;
         this.isHit = false;
@@ -330,15 +344,18 @@ class Bullet {
     }
 
     hitTarget() {
-        const damage = 2;
-        const truedamage = Math.max(0, damage - this.target.def);
+        const truedamage = Math.max(0, this.dmg - this.target.def);
         this.target.hp -= truedamage;
         if (this.target.hp <= 0) {
             this.target.isDead = true;
             gameState.money += this.target.reward;
             updateMoney();
+            selectedThing = null;
+        } else {
+            updateInfoPanel();            
         }
         this.isHit = true;
+
     }
 
     draw() {
@@ -350,15 +367,15 @@ class Bullet {
 }
 
 class TankBullet extends Bullet {
-    constructor(x, y, target) {
-        super(x, y, target);
+    constructor(x, y, target, dmg) {
+        super(x, y, target, dmg);
         this.speed = 2;
         this.radius = 7;
         this.splashRadius = 50; // splash damage radius in pixels
     }
 
     hitTarget() {
-        this.target.hp -= 6 - this.target.def;  
+        this.target.hp -= this.dmg - this.target.def;  
         if (this.target.hp <= 0) { this.target.isDead = true;}
         
         gameState.enemies.forEach(enemy => {
@@ -368,7 +385,7 @@ class TankBullet extends Bullet {
             const dist = Math.sqrt(dx * dx + dy * dy);
 
             if (dist <= this.splashRadius) {
-                enemy.hp -= 2 - enemy.def; // splash damage = 5
+                enemy.hp -= Math.max(0, this.dmg/2 - enemy.def); // splash damage
 
             if (enemy.hp <= 0) {enemy.isDead = true;}
             }
@@ -377,10 +394,13 @@ class TankBullet extends Bullet {
     
         // Reward 
         gameState.enemies.forEach(enemy => {
-        if (enemy.isDead) {
-            gameState.money += enemy.reward;
-        }
+            if (!enemy.wasDead && enemy.isDead) {
+                gameState.money += enemy.reward;
+                enemy.wasDead = true; // mark as rewarded
+                selectedThing = null;
+            }
         });
+        updateInfoPanel();            
         updateMoney();
         this.isHit = true;
     }
@@ -416,7 +436,11 @@ function updateHearts() {
 
 // Place towers by tapping/clicking
 const sellButton = document.getElementById("selltower");
+const upgradeTowerbtn = document.getElementById("upgradetower");
+
+const infopanel = document.getElementById("infopanel");
 let selectedTower = null;
+let selectedThing = null;
 
 function isPointInTower(x, y, tower) {
     return (
@@ -445,27 +469,39 @@ canvas.addEventListener("click", (e) => {
     // Check if clicked on a tower to select/sell
     for (let i = 0; i < gameState.towers.length; i++) {
         if (isPointInTower(x, y, gameState.towers[i])) {
-        selectedTower = gameState.towers[i];
-        clickedOnTower = true;
-        
-        sellButton.style.position ="absolute";
-        sellButton.style.display ="block";
-        sellButton.style.left = (rect.left + selectedTower.x + 20 ) + "px";
-        sellButton.style.top = (rect.top + selectedTower.y + 20 ) + "px";
-        
-        break;
+            selectedTower = gameState.towers[i];
+            clickedOnTower = true;
+            
+            sellButton.style.position ="absolute";
+            sellButton.style.display ="block";
+            sellButton.style.left = (rect.left + selectedTower.x + 20 ) + "px";
+            sellButton.style.top = (rect.top + selectedTower.y + 20 ) + "px";
+
+            upgradeTowerbtn.style.position ="absolute";
+            upgradeTowerbtn.style.display ="block";
+            upgradeTowerbtn.style.left = (rect.left + selectedTower.x + 20 ) + "px";
+            upgradeTowerbtn.style.top = (rect.top + selectedTower.y - 20 ) + "px";
+
+            selectedThing = selectedTower
+            updateInfoPanel();
+            break;
+        }
+    }
+    // Checking if you clicked on enemy
+    for (let i = 0; i < gameState.enemies.length; i++) {
+        const enemy = gameState.enemies[i];
+        if (isPointInEnemy(x, y, gameState.enemies[i])) {
+            selectedThing = enemy;
+            updateInfoPanel();
+            break; 
         }
     }
 
-    for (let i = 0; i < gameState.enemies.length; i++) {
-        if (isPointInEnemy(x, y, gameState.enemies[i])) {
-            console.log("Enemy has been clicked");
-        }
-    }
 
     // If no tower selected, try placing a new tower
     if (!clickedOnTower) {
         sellButton.style.display = "none";
+        upgradeTowerbtn.style.display = "none";
         selectedTower = null;
         if (selectedTowerType && gameState.money >= towerCosts[selectedTowerType] && sameTowerSelected === true) {
             let newTower;
@@ -479,6 +515,17 @@ canvas.addEventListener("click", (e) => {
     }
 });
 
+function updateInfoPanel() {
+    if (!selectedThing) {
+        infopanel.textContent = "Nothing selected"
+    } else if (selectedThing.type) {
+        infopanel.textContent = `Tower: ${selectedThing.type}, Level: ${selectedThing.level} / ${selectedThing.maxlevel}, Range: ${selectedThing.range}, Firerate: ${selectedThing.fireRate}`;
+    } else {
+        infopanel.textContent = `Enemy Name: ${selectedThing.name || "Unknown"}, Health: ${selectedThing.hp} / ${selectedThing.maxHp}, Speed: ${selectedThing.speed}, Defence: ${selectedThing.def}`;
+    }
+}
+
+// Buttons for each tower
 sellButton.addEventListener("click", () => {
     if (selectedTower) {
         // Refund 50% of tower cost
@@ -486,15 +533,28 @@ sellButton.addEventListener("click", () => {
         gameState.money += refund;
         updateMoney();
         sellButton.style.display = "none";
-
+        upgradeTowerbtn.style.display = "none";
         // Remove the tower
         gameState.towers = gameState.towers.filter(t => t !== selectedTower);
         selectedTower = null;
-    } else {
-        alert("No tower selected to sell!");
+        selectedThing = null;
+        updateInfoPanel();
     }
 });
 
+// Upgrading
+upgradeTowerbtn.addEventListener("click", () => {
+    const upgradecost = Math.max(0, towerCosts[selectedTower.type] * selectedTower.level/2)
+
+    if (selectedTower && selectedTower.maxlevel > selectedTower.level && upgradecost <= gameState.money) {
+        selectedTower.upgrade();
+        gameState.money -= upgradecost;
+        updateMoney();  
+        updateInfoPanel();
+    }
+});
+
+// Game loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -545,20 +605,20 @@ function gameLoop() {
 // Hide Stuff
 showScreen(titleScreen);
 sellButton.style.display = "none";
+upgradeTowerbtn.style.display = "none";
 
 // Stuff
 updateMoney();
 gameLoop();
 
+// Exports
 export { Enemy, Sheller, Speedling, Gunner, Tank, Bullet, TankBullet };
-export { updateMoney, updateLevel, updateStars, updateHearts, showScreen }
+export { updateMoney, updateLevel, updateStars, updateHearts, showScreen };
+
 /* Version history
-V1.14.4 - Shows cost and name of each node (next to node) and put description and effect when clicking on a node
-V1.14.5 - Fixed a few things with node and improved quality
-V1.14.6 - Now when you unlock upgrades, it says purchased :D
-V1.15 - Updated path mechanics, added more paths possible
-V1.15.1 - Finally added the hearts system so you can LOSE
-V1.15.2 - Fixed a few displaying bugs and some other annoying bugs (around 4 or 5 total)
-V1.16 - Added level 4 offically
-V1.16.1 - Modified original levels and did more stuff :0
+V1.16.2 - Optimized code
+V1.17 - Added upgrading towers
+V1.17.1 - Moved around some stuff visually
+V1.17.2 - Added selection on towers or enemies. Lets you see stats
+V1.17.3 - Fixed bugs with selection and other minor bugs
 */ 
